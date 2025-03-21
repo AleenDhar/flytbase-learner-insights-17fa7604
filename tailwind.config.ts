@@ -18,6 +18,10 @@ export default {
 				'2xl': '1400px'
 			}
 		},
+		fontFamily: {
+			sans: ['Inter', 'sans-serif'],
+			// Set Inter as the default font for the entire site
+		},
 		extend: {
 			colors: {
 				border: 'hsl(var(--border))',

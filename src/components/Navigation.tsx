@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Menu, X, User, Book, FileText, HelpCircle, Settings, LogOut, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Link } from 'react-router-dom';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,19 +24,19 @@ const Navigation = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
-              <h1 className="text-2xl font-semibold text-flytbase-primary">FlytBase Academy</h1>
+              <Link to="/" className="text-2xl font-semibold text-flytbase-primary">FlytBase Academy</Link>
             </div>
           </div>
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <a 
-              href="#" 
+            <Link 
+              to="/courses" 
               className="inline-flex items-center px-1 pt-1 text-sm font-medium text-neutral-800 hover:text-flytbase-primary border-b-2 border-transparent hover:border-flytbase-primary transition-all duration-200"
             >
               <Book className="mr-1 h-4 w-4" />
               Courses
-            </a>
+            </Link>
             <a 
               href="#" 
               className="inline-flex items-center px-1 pt-1 text-sm font-medium text-neutral-800 hover:text-flytbase-primary border-b-2 border-transparent hover:border-flytbase-primary transition-all duration-200"
@@ -120,15 +121,15 @@ const Navigation = () => {
       {/* Mobile Menu */}
       <div className={cn("md:hidden", isOpen ? "block" : "hidden")}>
         <div className="pt-2 pb-3 space-y-1 animate-fade-in">
-          <a
-            href="#"
+          <Link
+            to="/courses"
             className="block pl-3 pr-4 py-2 border-l-4 border-flytbase-primary text-base font-medium text-flytbase-primary bg-flytbase-light"
           >
             <span className="flex items-center">
               <Book className="mr-2 h-5 w-5" />
               Courses
             </span>
-          </a>
+          </Link>
           <a
             href="#"
             className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-neutral-800 hover:bg-neutral-50 hover:border-neutral-300 hover:text-neutral-800"

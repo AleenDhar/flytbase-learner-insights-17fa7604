@@ -38,10 +38,40 @@ const App = () => {
             <Route path="/" element={<Index />} />
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/sign-up" element={<SignUp />} />
-            <Route path="/courses" element={<Courses />} />
-            <Route path="/courses/:courseId" element={<CourseDetail />} />
-            <Route path="/assessments" element={<Assessments />} />
-            <Route path="/assessments/:assessmentId" element={<AssessmentDetail />} />
+            
+            {/* Protected routes that require authentication */}
+            <Route 
+              path="/courses" 
+              element={
+                <ProtectedRoute>
+                  <Courses />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/courses/:courseId" 
+              element={
+                <ProtectedRoute>
+                  <CourseDetail />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/assessments" 
+              element={
+                <ProtectedRoute>
+                  <Assessments />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/assessments/:assessmentId" 
+              element={
+                <ProtectedRoute>
+                  <AssessmentDetail />
+                </ProtectedRoute>
+              } 
+            />
             
             <Route 
               path="/dashboard" 

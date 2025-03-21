@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -247,9 +246,7 @@ const Index = () => {
             <div>
               <h4 className="text-white font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2">
-                {["Courses", "Certifications", "Instructors", "Resources", "Community"].map((item, i) => (
-                  <li key={i}><a href="#" className="hover:text-white transition-colors">{item}</a></li>
-                ))}
+                <li><a href="https://flytbase.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">FlytBase.com</a></li>
               </ul>
             </div>
             <div>

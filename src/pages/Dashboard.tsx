@@ -2,7 +2,6 @@
 import React from 'react';
 import Navigation from '@/components/Navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import CoursePopularity from '@/components/CoursePopularity';
 import StudentProgress from '@/components/StudentProgress';
 import LearningPaths from '@/components/LearningPaths';
 
@@ -22,16 +21,11 @@ const Dashboard = () => {
         <Tabs defaultValue="progress" className="space-y-8">
           <TabsList className="bg-[#1A1F2C] border border-white/5">
             <TabsTrigger value="progress">My Progress</TabsTrigger>
-            <TabsTrigger value="courses">Course Insights</TabsTrigger>
             <TabsTrigger value="paths">Learning Paths</TabsTrigger>
           </TabsList>
           
           <TabsContent value="progress" className="animate-fade-in">
             <StudentProgress />
-          </TabsContent>
-          
-          <TabsContent value="courses" className="animate-fade-in">
-            <CoursePopularity />
           </TabsContent>
           
           <TabsContent value="paths" className="animate-fade-in">

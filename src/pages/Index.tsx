@@ -20,9 +20,6 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="md:flex md:items-center md:justify-between">
             <div className="md:w-3/5 animate-fade-in" style={{ '--delay': '0' } as React.CSSProperties}>
-              <div className="mb-6">
-                <BrandLogo className="h-12" />
-              </div>
               <p className="text-xl mb-8 text-blue-100">Become a certified drone expert with our industry-leading courses and hands-on training</p>
               <div className="flex flex-wrap gap-4">
                 <Button size="lg" className="bg-white text-flytbase-primary hover:bg-blue-50">

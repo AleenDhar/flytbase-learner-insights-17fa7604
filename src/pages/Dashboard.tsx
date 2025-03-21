@@ -4,8 +4,11 @@ import Navigation from '@/components/Navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StudentProgress from '@/components/StudentProgress';
 import LearningPaths from '@/components/LearningPaths';
+import { useUser } from '@clerk/clerk-react';
 
 const Dashboard = () => {
+  const { user } = useUser();
+  
   return (
     <div className="min-h-screen bg-flytbase-primary">
       <Navigation />
@@ -14,7 +17,7 @@ const Dashboard = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold text-neutral-100">Student Dashboard</h1>
-            <p className="text-neutral-400 mt-1">Track your progress and explore learning opportunities</p>
+            <p className="text-neutral-400 mt-1">Welcome, {user?.firstName || "Student"}! Track your progress and explore learning opportunities</p>
           </div>
         </div>
         

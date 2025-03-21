@@ -3,22 +3,40 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X, ChevronDown } from 'lucide-react';
+import { SignedIn, SignedOut, UserButton, useUser, useAuth } from '@clerk/clerk-react';
 
 const Navigation = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isSignedIn, user } = useUser();
+  const { has } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+
+  // Get admin status
+  const isAdmin = 
+    isSignedIn && 
+    (["admin@flytbase.com", "admin2@flytbase.com"].includes(user?.primaryEmailAddress?.emailAddress as string) || 
+    has({ role: "admin" }));
 
   // Define navigation items
   const navItems = [
     { name: 'Home', path: '/' },
     { name: 'Courses', path: '/courses' },
     { name: 'Assessments', path: '/assessments' },
-    { name: 'Dashboard', path: '/dashboard' }
   ];
+
+  // Add dashboard link for signed-in users
+  if (isSignedIn) {
+    navItems.push({ name: 'Dashboard', path: '/dashboard' });
+    
+    // Add admin dashboard link for admin users
+    if (isAdmin) {
+      navItems.push({ name: 'Admin', path: '/admin' });
+    }
+  }
 
   return (
     <nav className="bg-flytbase-primary border-b border-white/10 sticky top-0 z-10">
@@ -49,12 +67,29 @@ const Navigation = () => {
             </div>
           </div>
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" className="text-neutral-300 hover:text-white">
-              Sign In
-            </Button>
-            <Button className="bg-flytbase-secondary hover:bg-flytbase-secondary/90">
-              Sign Up
-            </Button>
+            <SignedIn>
+              <UserButton 
+                appearance={{
+                  elements: {
+                    userButtonAvatarBox: "w-9 h-9",
+                    userButtonBox: "focus:shadow-none"
+                  }
+                }}
+                afterSignOutUrl="/"
+              />
+            </SignedIn>
+            <SignedOut>
+              <Link to="/sign-in">
+                <Button variant="ghost" className="text-neutral-300 hover:text-white">
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/sign-up">
+                <Button className="bg-flytbase-secondary hover:bg-flytbase-secondary/90">
+                  Sign Up
+                </Button>
+              </Link>
+            </SignedOut>
           </div>
           <div className="md:hidden">
             <button
@@ -89,12 +124,41 @@ const Navigation = () => {
           </div>
           <div className="pt-4 pb-3 border-t border-white/10">
             <div className="space-y-2 px-2">
-              <Button variant="ghost" className="w-full justify-start text-neutral-300 hover:text-white">
-                Sign In
-              </Button>
-              <Button className="w-full justify-start bg-flytbase-secondary hover:bg-flytbase-secondary/90">
-                Sign Up
-              </Button>
+              <SignedIn>
+                <div className="flex items-center px-3 py-2">
+                  <div className="mr-3">
+                    <UserButton 
+                      appearance={{
+                        elements: {
+                          userButtonAvatarBox: "w-9 h-9",
+                          userButtonBox: "focus:shadow-none"
+                        }
+                      }}
+                      afterSignOutUrl="/"
+                    />
+                  </div>
+                  <div>
+                    <div className="text-base font-medium text-white">
+                      {user?.fullName || "User"}
+                    </div>
+                    <div className="text-sm text-neutral-400">
+                      {user?.primaryEmailAddress?.emailAddress}
+                    </div>
+                  </div>
+                </div>
+              </SignedIn>
+              <SignedOut>
+                <Link to="/sign-in" onClick={() => setIsMenuOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start text-neutral-300 hover:text-white">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/sign-up" onClick={() => setIsMenuOpen(false)}>
+                  <Button className="w-full justify-start bg-flytbase-secondary hover:bg-flytbase-secondary/90">
+                    Sign Up
+                  </Button>
+                </Link>
+              </SignedOut>
             </div>
           </div>
         </div>

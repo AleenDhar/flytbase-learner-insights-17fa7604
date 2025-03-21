@@ -12,8 +12,9 @@ const Index = () => {
       
       {/* Hero Section */}
       <section className="relative bg-flytbase-primary text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1488590528505-98d2b5aba04b')] bg-cover bg-center"></div>
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute inset-0 bg-[url('/lovable-uploads/21a681d0-8a71-4d3d-907a-38d6aeed53d4.png')] bg-cover bg-center bg-no-repeat"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-flytbase-primary via-flytbase-primary/80 to-transparent"></div>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="md:flex md:items-center md:justify-between">

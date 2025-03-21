@@ -1,43 +1,269 @@
 
 import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import Navigation from '@/components/Navigation';
-import PerformanceDashboard from '@/components/PerformanceDashboard';
-import CourseInsights from '@/components/CourseInsights';
-import StudentProgress from '@/components/StudentProgress';
+import { BookOpen, Award, Layers, Users, ArrowRight } from 'lucide-react';
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-neutral-100">
       <Navigation />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-neutral-900 mb-2">Learning Dashboard</h1>
-          <p className="text-neutral-600">Track your progress and explore FlytBase drone courses</p>
+      {/* Hero Section */}
+      <section className="relative bg-flytbase-primary text-white py-20 overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1488590528505-98d2b5aba04b')] bg-cover bg-center"></div>
         </div>
-        
-        <div className="space-y-8">
-          {/* Performance Dashboard */}
-          <section className="animate-fade-in" style={{ '--delay': '0' } as React.CSSProperties}>
-            <PerformanceDashboard />
-          </section>
-          
-          {/* Course Insights */}
-          <section className="animate-fade-in" style={{ '--delay': '1' } as React.CSSProperties}>
-            <CourseInsights />
-          </section>
-          
-          {/* Student Progress */}
-          <section className="animate-fade-in" style={{ '--delay': '2' } as React.CSSProperties}>
-            <h2 className="text-xl font-semibold text-neutral-800 mb-4">Student Progress</h2>
-            <StudentProgress />
-          </section>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="md:flex md:items-center md:justify-between">
+            <div className="md:w-3/5 animate-fade-in" style={{ '--delay': '0' } as React.CSSProperties}>
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">Welcome to FlytBase Academy</h1>
+              <p className="text-xl mb-8 text-blue-100">Become a certified drone expert with our industry-leading courses and hands-on training</p>
+              <div className="flex flex-wrap gap-4">
+                <Button size="lg" className="bg-white text-flytbase-primary hover:bg-blue-50">
+                  Explore Courses
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                <Button variant="outline" size="lg" className="bg-transparent border-white text-white hover:bg-white/10">
+                  Sign Up Free
+                </Button>
+              </div>
+            </div>
+            <div className="hidden md:block md:w-2/5 animate-fade-in" style={{ '--delay': '1' } as React.CSSProperties}>
+              <div className="p-4 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
+                <img 
+                  src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81" 
+                  alt="Students learning drone technology" 
+                  className="rounded-lg shadow-lg"
+                />
+              </div>
+            </div>
+          </div>
         </div>
-      </main>
+      </section>
       
-      <footer className="bg-white py-6">
+      {/* Features Section */}
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center text-neutral-500 text-sm">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-neutral-900">Why Choose FlytBase Academy</h2>
+            <p className="text-lg text-neutral-600 mt-4 max-w-3xl mx-auto">
+              Our comprehensive curriculum and industry partnerships ensure you get the skills needed in today's drone technology landscape
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              {
+                icon: <BookOpen className="h-10 w-10" />,
+                title: "Expert-Led Courses",
+                description: "Learn from industry professionals with years of real-world drone experience"
+              },
+              {
+                icon: <Award className="h-10 w-10" />,
+                title: "Industry Certification",
+                description: "Earn recognized certifications that boost your career prospects"
+              },
+              {
+                icon: <Layers className="h-10 w-10" />,
+                title: "Hands-on Projects",
+                description: "Apply your knowledge through practical exercises and simulations"
+              },
+              {
+                icon: <Users className="h-10 w-10" />,
+                title: "Community Support",
+                description: "Join a global community of drone enthusiasts and professionals"
+              }
+            ].map((feature, index) => (
+              <Card key={index} className="border-none shadow-card hover-lift animate-fade-in" style={{ '--delay': index * 0.1 + 2 } as React.CSSProperties}>
+                <CardContent className="pt-6">
+                  <div className="rounded-full bg-flytbase-light p-3 inline-flex text-flytbase-primary mb-4">
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                  <p className="text-neutral-600">{feature.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+      
+      {/* Course Categories */}
+      <section className="py-16 bg-neutral-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-neutral-900">Explore Our Curriculum</h2>
+            <p className="text-lg text-neutral-600 mt-4 max-w-3xl mx-auto">
+              From beginner to expert, we offer a range of courses to help you master drone technology
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                title: "Drone Piloting Fundamentals",
+                level: "Beginner",
+                modules: 8,
+                image: "https://images.unsplash.com/photo-1531297484001-80022131f5a1"
+              },
+              {
+                title: "Advanced Flight Operations",
+                level: "Intermediate",
+                modules: 12,
+                image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d"
+              },
+              {
+                title: "Drone Programming & Automation",
+                level: "Advanced",
+                modules: 10,
+                image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c"
+              }
+            ].map((course, index) => (
+              <div 
+                key={index}
+                className="rounded-xl overflow-hidden shadow-card bg-white hover-lift animate-fade-in"
+                style={{ '--delay': index * 0.1 + 3 } as React.CSSProperties}
+              >
+                <div className="h-48 overflow-hidden">
+                  <img 
+                    src={course.image} 
+                    alt={course.title} 
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                  />
+                </div>
+                <div className="p-6">
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="badge badge-blue">{course.level}</span>
+                    <span className="text-sm text-neutral-500">{course.modules} Modules</span>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-4">{course.title}</h3>
+                  <Button variant="outline" className="w-full">
+                    View Details
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="mt-12 text-center">
+            <Button size="lg" className="bg-flytbase-primary text-white">
+              View All Courses
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+      </section>
+      
+      {/* Testimonial Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-neutral-900">What Our Students Say</h2>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                quote: "The hands-on projects helped me transition from a hobbyist to a professional drone operator in just a few months.",
+                name: "Alex Johnson",
+                title: "Commercial Drone Pilot"
+              },
+              {
+                quote: "FlytBase Academy's certification gave me the credibility I needed to start my own aerial photography business.",
+                name: "Sarah Chen",
+                title: "Aerial Photographer"
+              },
+              {
+                quote: "The instructor support is exceptional. They're always available to answer questions and provide feedback.",
+                name: "Michael Rodriguez",
+                title: "Drone Mapping Specialist"
+              }
+            ].map((testimonial, index) => (
+              <Card 
+                key={index} 
+                className="border-none shadow-card hover-lift animate-fade-in"
+                style={{ '--delay': index * 0.1 + 4 } as React.CSSProperties}
+              >
+                <CardContent className="p-6">
+                  <div className="mb-4 text-flytbase-primary">
+                    {"★".repeat(5)}
+                  </div>
+                  <p className="text-lg italic mb-6 text-neutral-700">"{testimonial.quote}"</p>
+                  <div className="flex items-center">
+                    <div className="h-12 w-12 rounded-full bg-neutral-200 flex items-center justify-center text-neutral-500 font-bold text-xl">
+                      {testimonial.name.charAt(0)}
+                    </div>
+                    <div className="ml-4">
+                      <p className="font-semibold">{testimonial.name}</p>
+                      <p className="text-sm text-neutral-500">{testimonial.title}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+      
+      {/* CTA Section */}
+      <section className="py-12 bg-flytbase-primary text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold mb-4">Ready to Start Your Drone Journey?</h2>
+          <p className="text-xl mb-8 max-w-3xl mx-auto text-blue-100">
+            Join thousands of students who have advanced their careers with FlytBase Academy
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Button size="lg" className="bg-white text-flytbase-primary hover:bg-blue-50">
+              Get Started Today
+            </Button>
+            <Button variant="outline" size="lg" className="bg-transparent border-white text-white hover:bg-white/10">
+              Browse Courses
+            </Button>
+          </div>
+        </div>
+      </section>
+      
+      <footer className="bg-neutral-900 text-neutral-400 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <h3 className="text-white font-semibold text-lg mb-4">FlytBase Academy</h3>
+              <p className="mb-4">Empowering the next generation of drone experts with cutting-edge education and certification.</p>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Quick Links</h4>
+              <ul className="space-y-2">
+                {["Courses", "Certifications", "Instructors", "Resources", "Community"].map((item, i) => (
+                  <li key={i}><a href="#" className="hover:text-white transition-colors">{item}</a></li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Support</h4>
+              <ul className="space-y-2">
+                {["Help Center", "Contact Us", "FAQs", "System Requirements", "Privacy Policy"].map((item, i) => (
+                  <li key={i}><a href="#" className="hover:text-white transition-colors">{item}</a></li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Newsletter</h4>
+              <p className="mb-4">Subscribe to our newsletter for the latest updates and offers.</p>
+              <div className="flex">
+                <input 
+                  type="email" 
+                  placeholder="Your email" 
+                  className="bg-neutral-800 text-white px-4 py-2 rounded-l-md focus:outline-none flex-1"
+                />
+                <Button className="rounded-l-none">
+                  Subscribe
+                </Button>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-neutral-800 pt-8 mt-8 text-center">
             <p>© 2023 FlytBase Academy. All rights reserved.</p>
           </div>
         </div>

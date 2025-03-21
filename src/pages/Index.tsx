@@ -231,7 +231,7 @@ const Index = () => {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="mb-4">
-                <BrandLogo className="h-8" />
+                <BrandLogo className="h-8 w-auto" />
               </div>
               <p className="mb-4">Empowering the next generation of drone experts with cutting-edge education and certification.</p>
             </div>

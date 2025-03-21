@@ -1,7 +1,7 @@
-
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { useUser, useAuth } from "@clerk/clerk-react";
+import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AdminRouteProps {
   children: React.ReactNode;
@@ -14,23 +14,44 @@ const ADMIN_EMAILS = [
 ];
 
 const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
-  const { isSignedIn, isLoaded, user } = useUser();
-  const { has } = useAuth();
+  const { user, isLoading } = useAuth();
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
-  if (!isLoaded) {
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
+
+      // Check if user's email is in admin list
+      if (user.email && ADMIN_EMAILS.includes(user.email)) {
+        setIsAdmin(true);
+        return;
+      }
+
+      // Otherwise, check user metadata for admin role
+      if (user.app_metadata && user.app_metadata.role === 'admin') {
+        setIsAdmin(true);
+        return;
+      }
+
+      setIsAdmin(false);
+    };
+
+    checkAdminStatus();
+  }, [user]);
+
+  if (isLoading || isAdmin === null) {
     return <div className="min-h-screen bg-flytbase-primary flex items-center justify-center">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-flytbase-secondary"></div>
     </div>;
   }
 
   // Check if user is signed in and has admin role
-  if (!isSignedIn) {
+  if (!user) {
     return <Navigate to="/sign-in" replace />;
   }
-
-  // Check if user's email is in admin list or if they have admin role in metadata
-  const isAdmin = ADMIN_EMAILS.includes(user?.primaryEmailAddress?.emailAddress as string) || 
-                 has({ role: "admin" });
 
   if (!isAdmin) {
     return <Navigate to="/dashboard" replace />;

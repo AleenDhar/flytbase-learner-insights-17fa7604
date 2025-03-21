@@ -1,25 +1,39 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, ChevronDown } from 'lucide-react';
-import { SignedIn, SignedOut, UserButton, useUser, useAuth } from '@clerk/clerk-react';
+import { Menu, X } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const Navigation = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isSignedIn, user } = useUser();
-  const { has } = useAuth();
+  const { user, signOut } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Get admin status
-  const isAdmin = 
-    isSignedIn && 
-    (["admin@flytbase.com", "admin2@flytbase.com"].includes(user?.primaryEmailAddress?.emailAddress as string) || 
-    has({ role: "admin" }));
+  useEffect(() => {
+    if (user?.email) {
+      // Check if user is admin
+      const adminEmails = ["admin@flytbase.com", "admin2@flytbase.com"];
+      const isUserAdmin = adminEmails.includes(user.email) || 
+                         (user.app_metadata && user.app_metadata.role === 'admin');
+      setIsAdmin(isUserAdmin);
+    } else {
+      setIsAdmin(false);
+    }
+  }, [user]);
 
   // Define navigation items - only show public pages for non-authenticated users
   const navItems = [
@@ -29,7 +43,7 @@ const Navigation = () => {
   ];
 
   // Add dashboard link for signed-in users only
-  if (isSignedIn) {
+  if (user) {
     navItems.push({ name: 'Dashboard', path: '/dashboard' });
     
     // Add admin dashboard link for admin users
@@ -37,6 +51,19 @@ const Navigation = () => {
       navItems.push({ name: 'Admin', path: '/admin' });
     }
   }
+
+  const handleSignOut = async () => {
+    await signOut();
+    setIsMenuOpen(false);
+  };
+
+  const getUserInitials = () => {
+    if (!user) return 'U';
+    if (user.user_metadata?.first_name) {
+      return `${user.user_metadata.first_name.charAt(0)}${user.user_metadata.last_name ? user.user_metadata.last_name.charAt(0) : ''}`;
+    }
+    return user.email ? user.email.charAt(0).toUpperCase() : 'U';
+  };
 
   return (
     <nav className="bg-flytbase-primary border-b border-white/10 sticky top-0 z-10">
@@ -67,24 +94,50 @@ const Navigation = () => {
             </div>
           </div>
           <div className="hidden md:flex items-center space-x-4">
-            <SignedIn>
-              <UserButton 
-                appearance={{
-                  elements: {
-                    userButtonAvatarBox: "w-9 h-9",
-                    userButtonBox: "focus:shadow-none"
-                  }
-                }}
-                afterSignOutUrl="/"
-              />
-            </SignedIn>
-            <SignedOut>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage src={user.user_metadata?.avatar_url || ''} alt={user.email || 'User'} />
+                      <AvatarFallback className="bg-flytbase-secondary text-white">
+                        {getUserInitials()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end">
+                  <div className="flex items-center justify-start gap-2 p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      {user.user_metadata?.first_name && (
+                        <p className="font-medium">
+                          {user.user_metadata.first_name} {user.user_metadata.last_name}
+                        </p>
+                      )}
+                      {user.email && (
+                        <p className="w-[200px] truncate text-sm text-muted-foreground">
+                          {user.email}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard">Dashboard</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="text-red-500">
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
               <Link to="/sign-in">
                 <Button className="bg-flytbase-secondary hover:bg-flytbase-secondary/90">
                   Start Learning
                 </Button>
               </Link>
-            </SignedOut>
+            )}
           </div>
           <div className="md:hidden">
             <button
@@ -119,36 +172,43 @@ const Navigation = () => {
           </div>
           <div className="pt-4 pb-3 border-t border-white/10">
             <div className="space-y-2 px-2">
-              <SignedIn>
-                <div className="flex items-center px-3 py-2">
-                  <div className="mr-3">
-                    <UserButton 
-                      appearance={{
-                        elements: {
-                          userButtonAvatarBox: "w-9 h-9",
-                          userButtonBox: "focus:shadow-none"
-                        }
-                      }}
-                      afterSignOutUrl="/"
-                    />
-                  </div>
-                  <div>
-                    <div className="text-base font-medium text-white">
-                      {user?.fullName || "User"}
+              {user ? (
+                <>
+                  <div className="flex items-center px-3 py-2">
+                    <div className="mr-3">
+                      <Avatar className="h-9 w-9">
+                        <AvatarImage src={user.user_metadata?.avatar_url || ''} alt={user.email || 'User'} />
+                        <AvatarFallback className="bg-flytbase-secondary text-white">
+                          {getUserInitials()}
+                        </AvatarFallback>
+                      </Avatar>
                     </div>
-                    <div className="text-sm text-neutral-400">
-                      {user?.primaryEmailAddress?.emailAddress}
+                    <div>
+                      <div className="text-base font-medium text-white">
+                        {user.user_metadata?.first_name 
+                          ? `${user.user_metadata.first_name} ${user.user_metadata.last_name || ''}`
+                          : user.email?.split('@')[0] || 'User'}
+                      </div>
+                      <div className="text-sm text-neutral-400">
+                        {user.email}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </SignedIn>
-              <SignedOut>
+                  <Button 
+                    onClick={handleSignOut} 
+                    variant="destructive" 
+                    className="w-full justify-start"
+                  >
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
                 <Link to="/sign-in" onClick={() => setIsMenuOpen(false)}>
                   <Button className="w-full justify-start bg-flytbase-secondary hover:bg-flytbase-secondary/90">
                     Start Learning
                   </Button>
                 </Link>
-              </SignedOut>
+              )}
             </div>
           </div>
         </div>

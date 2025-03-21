@@ -39,28 +39,16 @@ const App = () => {
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/sign-up" element={<SignUp />} />
             
-            {/* Protected routes that require authentication */}
-            <Route 
-              path="/courses" 
-              element={
-                <ProtectedRoute>
-                  <Courses />
-                </ProtectedRoute>
-              } 
-            />
+            {/* Public routes for viewing lists of courses and assessments */}
+            <Route path="/courses" element={<Courses />} />
+            <Route path="/assessments" element={<Assessments />} />
+            
+            {/* Protected routes that require authentication for individual access */}
             <Route 
               path="/courses/:courseId" 
               element={
                 <ProtectedRoute>
                   <CourseDetail />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/assessments" 
-              element={
-                <ProtectedRoute>
-                  <Assessments />
                 </ProtectedRoute>
               } 
             />

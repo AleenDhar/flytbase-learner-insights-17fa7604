@@ -13,7 +13,6 @@ const Index = () => {
       {/* Hero Section */}
       <section className="relative bg-flytbase-primary text-white py-20 overflow-hidden">
         <div className="absolute inset-0 opacity-30">
-          {/* Update the image path to use relative URL that works in the public folder */}
           <div className="absolute inset-0 bg-[url('../lovable-uploads/21a681d0-8a71-4d3d-907a-38d6aeed53d4.png')] bg-cover bg-center bg-no-repeat"></div>
           <div className="absolute inset-0 bg-gradient-to-r from-flytbase-primary via-flytbase-primary/80 to-transparent"></div>
         </div>
@@ -231,7 +230,7 @@ const Index = () => {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="mb-4">
-                <BrandLogo className="h-10 max-w-[140px]" />
+                <BrandLogo />
               </div>
               <p className="mb-4">Empowering the next generation of drone experts with cutting-edge education and certification.</p>
             </div>
@@ -276,3 +275,4 @@ const Index = () => {
 };
 
 export default Index;
+

@@ -21,14 +21,14 @@ const Navigation = () => {
     (["admin@flytbase.com", "admin2@flytbase.com"].includes(user?.primaryEmailAddress?.emailAddress as string) || 
     has({ role: "admin" }));
 
-  // Define navigation items
+  // Define navigation items - only show public pages for non-authenticated users
   const navItems = [
     { name: 'Home', path: '/' },
     { name: 'Courses', path: '/courses' },
     { name: 'Assessments', path: '/assessments' },
   ];
 
-  // Add dashboard link for signed-in users
+  // Add dashboard link for signed-in users only
   if (isSignedIn) {
     navItems.push({ name: 'Dashboard', path: '/dashboard' });
     
@@ -80,13 +80,8 @@ const Navigation = () => {
             </SignedIn>
             <SignedOut>
               <Link to="/sign-in">
-                <Button variant="ghost" className="text-neutral-300 hover:text-white">
-                  Sign In
-                </Button>
-              </Link>
-              <Link to="/sign-up">
                 <Button className="bg-flytbase-secondary hover:bg-flytbase-secondary/90">
-                  Sign Up
+                  Start Learning
                 </Button>
               </Link>
             </SignedOut>
@@ -149,13 +144,8 @@ const Navigation = () => {
               </SignedIn>
               <SignedOut>
                 <Link to="/sign-in" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="ghost" className="w-full justify-start text-neutral-300 hover:text-white">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link to="/sign-up" onClick={() => setIsMenuOpen(false)}>
                   <Button className="w-full justify-start bg-flytbase-secondary hover:bg-flytbase-secondary/90">
-                    Sign Up
+                    Start Learning
                   </Button>
                 </Link>
               </SignedOut>

@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Microsoft, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
 
 const SignUp = () => {
   const { user, isLoading } = useAuth();
@@ -69,7 +69,7 @@ const SignUp = () => {
     }
   };
 
-  const handleSocialSignUp = async (provider: 'google' | 'microsoft') => {
+  const handleSocialSignUp = async (provider: 'google') => {
     try {
       setIsSubmitting(true);
       const { error } = await supabase.auth.signInWithOAuth({
@@ -118,16 +118,6 @@ const SignUp = () => {
                   <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                 </svg>
                 Continue with Google
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                className="w-full text-white border-white/10 hover:bg-[#2A3249]"
-                onClick={() => handleSocialSignUp('microsoft')}
-                disabled={isSubmitting}
-              >
-                <Microsoft className="mr-2" />
-                Continue with Microsoft
               </Button>
             </TabsContent>
             

@@ -16,10 +16,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 221 83% 53%;
+    --primary: 217 81% 45%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 221 83% 60%;
+    --secondary: 217 81% 45%;
     --secondary-foreground: 210 40% 98%;
 
     --muted: 210 40% 96.1%;
@@ -33,7 +33,7 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221 83% 53%;
+    --ring: 217 81% 45%;
 
     --radius: 0.5rem;
 
@@ -62,7 +62,7 @@
   }
 
   .glass-dark {
-    @apply bg-neutral-900/70 backdrop-blur-md border border-neutral-800/30;
+    @apply bg-flytbase-primary/70 backdrop-blur-md border border-flytbase-primary/30;
   }
 
   /* Clean shadows */
@@ -124,15 +124,25 @@
     transform: translateY(10px);
     transition: opacity 300ms, transform 300ms;
   }
+
+  /* FlytBase gradient */
+  .flytbase-gradient {
+    @apply bg-gradient-to-br from-flytbase-gradient-start to-flytbase-gradient-end;
+  }
+
+  /* FlytBase accent */
+  .flytbase-accent-gradient {
+    @apply bg-gradient-to-r from-flytbase-accent-yellow to-flytbase-accent-orange;
+  }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-flytbase-primary text-white py-2 px-4 rounded-md hover:bg-flytbase-primary/90 transition-colors duration-200;
+    @apply bg-flytbase-secondary text-white py-2 px-4 rounded-md hover:bg-flytbase-secondary/90 transition-colors duration-200;
   }
 
   .btn-secondary {
-    @apply bg-white text-flytbase-primary border border-flytbase-primary py-2 px-4 rounded-md hover:bg-flytbase-light transition-colors duration-200;
+    @apply bg-white text-flytbase-secondary border border-flytbase-secondary py-2 px-4 rounded-md hover:bg-flytbase-light transition-colors duration-200;
   }
 
   .badge {

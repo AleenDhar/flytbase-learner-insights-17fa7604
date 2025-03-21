@@ -30,8 +30,8 @@ const CourseCard: React.FC<CourseProps> = ({
   const getLevelColor = (level: string) => {
     switch(level) {
       case 'Beginner': return 'bg-green-100 text-green-800 hover:bg-green-200';
-      case 'Intermediate': return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
-      case 'Advanced': return 'bg-purple-100 text-purple-800 hover:bg-purple-200';
+      case 'Intermediate': return 'bg-flytbase-accent-yellow/20 text-flytbase-accent-orange hover:bg-flytbase-accent-yellow/30';
+      case 'Advanced': return 'bg-flytbase-secondary/10 text-flytbase-secondary hover:bg-flytbase-secondary/20';
       default: return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
     }
   };
@@ -45,7 +45,7 @@ const CourseCard: React.FC<CourseProps> = ({
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
         {youtubePlaylistId && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute inset-0 bg-flytbase-primary/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <Play className="h-12 w-12 text-white" />
           </div>
         )}
@@ -61,10 +61,10 @@ const CourseCard: React.FC<CourseProps> = ({
           </div>
           <span>{duration}</span>
         </div>
-        <h3 className="text-xl font-semibold mb-2 line-clamp-2">{title}</h3>
+        <h3 className="text-xl font-semibold mb-2 line-clamp-2 text-flytbase-primary">{title}</h3>
         <p className="text-neutral-600 mb-4 line-clamp-3">{description}</p>
         <Link to={`/courses/${id}`}>
-          <Button className="w-full group">
+          <Button className="w-full group bg-flytbase-secondary hover:bg-flytbase-secondary/90">
             View Course
             <ArrowRight className="ml-2 h-4 w-4 transform transition-transform group-hover:translate-x-1" />
           </Button>

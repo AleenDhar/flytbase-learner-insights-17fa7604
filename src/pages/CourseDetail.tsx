@@ -82,7 +82,7 @@ const CourseDetail = () => {
 
   if (!course) {
     return (
-      <div className="min-h-screen bg-neutral-100">
+      <div className="min-h-screen bg-flytbase-light">
         <Navigation />
         <div className="pt-24 pb-12 text-center">
           <h1 className="text-2xl font-bold">Course not found</h1>
@@ -92,13 +92,13 @@ const CourseDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-100">
+    <div className="min-h-screen bg-flytbase-light">
       <Navigation />
       
       {/* Header */}
       <section className="pt-20 md:pt-24 bg-flytbase-primary text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <Link to="/courses" className="inline-flex items-center text-blue-100 hover:text-white mb-6 transition-colors">
+          <Link to="/courses" className="inline-flex items-center text-neutral-300 hover:text-white mb-6 transition-colors">
             <ArrowLeft className="mr-2 h-5 w-5" />
             Back to Courses
           </Link>
@@ -107,24 +107,24 @@ const CourseDetail = () => {
             <div>
               <Badge className="mb-4">{course.level}</Badge>
               <h1 className="text-3xl md:text-4xl font-bold mb-4">{course.title}</h1>
-              <p className="text-blue-100 text-lg mb-6">{course.description}</p>
+              <p className="text-neutral-300 text-lg mb-6">{course.description}</p>
               
               <div className="flex flex-wrap gap-4 mb-6">
-                <div className="flex items-center text-blue-100">
+                <div className="flex items-center text-neutral-300">
                   <BookOpen className="mr-2 h-5 w-5" />
                   <span>{course.modules} Modules</span>
                 </div>
-                <div className="flex items-center text-blue-100">
+                <div className="flex items-center text-neutral-300">
                   <Clock className="mr-2 h-5 w-5" />
                   <span>{course.duration}</span>
                 </div>
-                <div className="flex items-center text-blue-100">
+                <div className="flex items-center text-neutral-300">
                   <Award className="mr-2 h-5 w-5" />
                   <span>Certificate on Completion</span>
                 </div>
               </div>
 
-              <Button size="lg" className="bg-white text-flytbase-primary hover:bg-blue-50">
+              <Button size="lg" className="bg-flytbase-accent-orange text-white hover:bg-flytbase-accent-orange/90">
                 Enroll Now
               </Button>
             </div>
@@ -148,7 +148,7 @@ const CourseDetail = () => {
           <div className="grid md:grid-cols-3 gap-8">
             {/* Sidebar - Module List */}
             <div className="md:col-span-1 bg-white p-6 rounded-lg shadow-sm">
-              <h2 className="text-xl font-semibold mb-4 flex items-center">
+              <h2 className="text-xl font-semibold mb-4 flex items-center text-flytbase-primary">
                 <List className="mr-2 h-5 w-5" />
                 Course Modules
               </h2>
@@ -158,7 +158,7 @@ const CourseDetail = () => {
                   <div key={index} className="border rounded-lg overflow-hidden">
                     <button
                       className={`w-full flex justify-between items-center p-3 text-left transition-colors ${
-                        activeModule === index ? 'bg-flytbase-light text-flytbase-primary' : 'hover:bg-neutral-50'
+                        activeModule === index ? 'bg-flytbase-secondary/10 text-flytbase-secondary' : 'hover:bg-neutral-50'
                       }`}
                       onClick={() => {
                         setActiveModule(index);
@@ -231,7 +231,7 @@ const CourseDetail = () => {
                 {/* Module Information */}
                 <div className="p-6">
                   <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-semibold">{modulesData[activeModule].title}</h2>
+                    <h2 className="text-2xl font-semibold text-flytbase-primary">{modulesData[activeModule].title}</h2>
                     <Badge variant="outline" className="flex items-center">
                       <Clock className="mr-1 h-3 w-3" />
                       {modulesData[activeModule].duration}
@@ -256,6 +256,7 @@ const CourseDetail = () => {
                     <Button
                       disabled={activeModule === modulesData.length - 1}
                       onClick={() => activeModule < modulesData.length - 1 && setActiveModule(activeModule + 1)}
+                      className="bg-flytbase-secondary hover:bg-flytbase-secondary/90"
                     >
                       Next Module
                     </Button>

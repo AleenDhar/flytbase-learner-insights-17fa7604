@@ -26,10 +26,17 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				flytbase: {
-          primary: '#1E40AF',
-          secondary: '#1D4ED8',
-          light: '#EEF2FF',
-          dark: '#1A1F2C'
+          primary: '#0B121E',
+          secondary: '#0E61DD',
+          light: '#F0F0F0',
+          accent: {
+            orange: '#FA8500',
+            yellow: '#FFAB49'
+          },
+          gradient: {
+            start: '#AABDFF',
+            end: '#0B121E'
+          }
         },
 				neutral: {
           100: '#F9FAFB',

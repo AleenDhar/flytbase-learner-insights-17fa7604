@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import CourseCard, { CourseProps } from '@/components/CourseCard';
@@ -5,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BookOpen, Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 // Mock data for courses
 export const coursesData: CourseProps[] = [
@@ -89,7 +91,7 @@ const Courses = () => {
   });
 
   return (
-    <div className="min-h-screen bg-neutral-100">
+    <div className="min-h-screen bg-flytbase-light">
       <Navigation />
       
       {/* Header */}
@@ -98,7 +100,7 @@ const Courses = () => {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold">Explore Our Courses</h1>
-              <p className="mt-2 text-blue-100 max-w-2xl">
+              <p className="mt-2 text-neutral-300 max-w-2xl">
                 From beginner to advanced, find the perfect drone course to elevate your skills and knowledge
               </p>
             </div>
@@ -111,7 +113,7 @@ const Courses = () => {
                       variant={activeFilter === filter.value ? "default" : "ghost"}
                       size="sm"
                       onClick={() => setActiveFilter(filter.value)}
-                      className={activeFilter === filter.value ? "bg-white text-flytbase-primary" : "text-white hover:bg-white/20"}
+                      className={activeFilter === filter.value ? "bg-flytbase-secondary text-white" : "text-white hover:bg-white/20"}
                     >
                       {filter.name}
                     </Button>
@@ -154,7 +156,7 @@ const Courses = () => {
               <h3 className="mt-4 text-lg font-medium text-neutral-900">No courses found</h3>
               <p className="mt-1 text-neutral-500">Try adjusting your search or filter to find what you're looking for.</p>
               <Button 
-                className="mt-6"
+                className="mt-6 bg-flytbase-secondary hover:bg-flytbase-secondary/90"
                 onClick={() => {
                   setSearchTerm('');
                   setActiveFilter(null);

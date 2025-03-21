@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Navigation from '@/components/Navigation';
+import BrandLogo from '@/components/BrandLogo';
 import { BookOpen, Award, Layers, Users, ArrowRight } from 'lucide-react';
 
 const Index = () => {
@@ -20,7 +20,9 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="md:flex md:items-center md:justify-between">
             <div className="md:w-3/5 animate-fade-in" style={{ '--delay': '0' } as React.CSSProperties}>
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">Welcome to FlytBase Academy</h1>
+              <div className="mb-6">
+                <BrandLogo className="h-12" />
+              </div>
               <p className="text-xl mb-8 text-blue-100">Become a certified drone expert with our industry-leading courses and hands-on training</p>
               <div className="flex flex-wrap gap-4">
                 <Button size="lg" className="bg-white text-flytbase-primary hover:bg-blue-50">
@@ -231,7 +233,9 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <h3 className="text-white font-semibold text-lg mb-4">FlytBase Academy</h3>
+              <div className="mb-4">
+                <BrandLogo className="h-8" />
+              </div>
               <p className="mb-4">Empowering the next generation of drone experts with cutting-edge education and certification.</p>
             </div>
             <div>

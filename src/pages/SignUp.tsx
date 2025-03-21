@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
+import BrandLogo from '@/components/BrandLogo';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Mail } from 'lucide-react';
@@ -94,7 +95,9 @@ const SignUp = () => {
     <div className="min-h-screen bg-flytbase-primary flex items-center justify-center p-4">
       <Card className="max-w-md w-full bg-[#1A1F2C] border-white/10">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-white">Create FlytBase Academy Account</CardTitle>
+          <div className="flex justify-center mb-4">
+            <BrandLogo className="h-10" />
+          </div>
           <CardDescription className="text-white/50">Start your learning journey today</CardDescription>
         </CardHeader>
         <CardContent>

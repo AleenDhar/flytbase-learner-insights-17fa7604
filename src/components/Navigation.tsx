@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import BrandLogo from './BrandLogo';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -72,7 +73,7 @@ const Navigation = () => {
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <Link to="/" className="flex items-center">
-                <span className="text-xl font-bold text-white">FlytBase Academy</span>
+                <BrandLogo />
               </Link>
             </div>
             <div className="hidden md:block ml-10">

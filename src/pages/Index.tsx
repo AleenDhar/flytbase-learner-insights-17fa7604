@@ -1,6 +1,8 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Link } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import BrandLogo from '@/components/BrandLogo';
 import { BookOpen, Award, Layers, Users, ArrowRight } from 'lucide-react';
@@ -21,12 +23,16 @@ const Index = () => {
             <div className="md:w-3/5 animate-fade-in" style={{ '--delay': '0' } as React.CSSProperties}>
               <p className="text-xl mb-8 text-blue-100">Become a certified drone expert with our industry-leading courses and hands-on training</p>
               <div className="flex flex-wrap gap-4">
-                <Button size="lg" className="bg-white text-flytbase-primary hover:bg-blue-50">
-                  Explore Courses
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                <Button size="lg" className="bg-white text-flytbase-primary hover:bg-blue-50" asChild>
+                  <Link to="/courses">
+                    Explore Courses
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
                 </Button>
-                <Button variant="outline" size="lg" className="bg-transparent border-white text-white hover:bg-white/10">
-                  Sign Up Free
+                <Button variant="outline" size="lg" className="bg-transparent border-white text-white hover:bg-white/10" asChild>
+                  <Link to="/sign-up">
+                    Sign Up Free
+                  </Link>
                 </Button>
               </div>
             </div>
@@ -215,11 +221,15 @@ const Index = () => {
             Join thousands of students who have advanced their careers with FlytBase Academy
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" className="bg-white text-flytbase-secondary hover:bg-blue-50">
-              Get Started Today
+            <Button size="lg" className="bg-white text-flytbase-secondary hover:bg-blue-50" asChild>
+              <Link to="/sign-up">
+                Get Started Today
+              </Link>
             </Button>
-            <Button variant="outline" size="lg" className="bg-transparent border-white text-white hover:bg-white/10">
-              Browse Courses
+            <Button variant="outline" size="lg" className="bg-transparent border-white text-white hover:bg-white/10" asChild>
+              <Link to="/courses">
+                Browse Courses
+              </Link>
             </Button>
           </div>
         </div>
@@ -275,4 +285,3 @@ const Index = () => {
 };
 
 export default Index;
-

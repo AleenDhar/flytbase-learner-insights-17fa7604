@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -73,7 +72,7 @@ const Navigation = () => {
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <Link to="/" className="flex items-center">
-                <BrandLogo />
+                <BrandLogo className="h-8 w-auto" />
               </Link>
             </div>
             <div className="hidden md:block ml-10">

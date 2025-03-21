@@ -33,8 +33,8 @@ const Index = () => {
             <div className="hidden md:block md:w-2/5 animate-fade-in" style={{ '--delay': '1' } as React.CSSProperties}>
               <div className="p-4 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
                 <img 
-                  src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81" 
-                  alt="Students learning drone technology" 
+                  src="/lovable-uploads/481a13eb-6855-4500-888c-8c5d4a3734a1.png" 
+                  alt="Advanced drone equipment and technology" 
                   className="rounded-lg shadow-lg"
                 />
               </div>
@@ -44,11 +44,11 @@ const Index = () => {
       </section>
       
       {/* Features Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-flytbase-primary text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-neutral-900">Why Choose FlytBase Academy</h2>
-            <p className="text-lg text-neutral-600 mt-4 max-w-3xl mx-auto">
+            <h2 className="text-3xl font-bold">Why Choose FlytBase Academy</h2>
+            <p className="text-lg text-neutral-300 mt-4 max-w-3xl mx-auto">
               Our comprehensive curriculum and industry partnerships ensure you get the skills needed in today's drone technology landscape
             </p>
           </div>
@@ -76,13 +76,13 @@ const Index = () => {
                 description: "Join a global community of drone enthusiasts and professionals"
               }
             ].map((feature, index) => (
-              <Card key={index} className="border-none shadow-card hover-lift animate-fade-in" style={{ '--delay': index * 0.1 + 2 } as React.CSSProperties}>
+              <Card key={index} className="border-none bg-[#1A1F2C] shadow-card hover-lift animate-fade-in" style={{ '--delay': index * 0.1 + 2 } as React.CSSProperties}>
                 <CardContent className="pt-6">
-                  <div className="rounded-full bg-flytbase-light p-3 inline-flex text-flytbase-primary mb-4">
+                  <div className="rounded-full bg-flytbase-secondary/20 p-3 inline-flex text-flytbase-secondary mb-4">
                     {feature.icon}
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-neutral-600">{feature.description}</p>
+                  <h3 className="text-xl font-semibold mb-2 text-white">{feature.title}</h3>
+                  <p className="text-neutral-300">{feature.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -91,11 +91,11 @@ const Index = () => {
       </section>
       
       {/* Course Categories */}
-      <section className="py-16 bg-neutral-100">
+      <section className="py-16 bg-[#121723]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-neutral-900">Explore Our Curriculum</h2>
-            <p className="text-lg text-neutral-600 mt-4 max-w-3xl mx-auto">
+            <h2 className="text-3xl font-bold text-white">Explore Our Curriculum</h2>
+            <p className="text-lg text-neutral-300 mt-4 max-w-3xl mx-auto">
               From beginner to expert, we offer a range of courses to help you master drone technology
             </p>
           </div>
@@ -123,7 +123,7 @@ const Index = () => {
             ].map((course, index) => (
               <div 
                 key={index}
-                className="rounded-xl overflow-hidden shadow-card bg-white hover-lift animate-fade-in"
+                className="rounded-xl overflow-hidden shadow-card bg-[#1A1F2C] hover-lift animate-fade-in"
                 style={{ '--delay': index * 0.1 + 3 } as React.CSSProperties}
               >
                 <div className="h-48 overflow-hidden">
@@ -135,11 +135,11 @@ const Index = () => {
                 </div>
                 <div className="p-6">
                   <div className="flex justify-between items-center mb-3">
-                    <span className="badge badge-blue">{course.level}</span>
-                    <span className="text-sm text-neutral-500">{course.modules} Modules</span>
+                    <span className="badge badge-blue bg-blue-900/40 text-blue-200 text-xs py-1 px-2 rounded">{course.level}</span>
+                    <span className="text-sm text-neutral-400">{course.modules} Modules</span>
                   </div>
-                  <h3 className="text-xl font-semibold mb-4">{course.title}</h3>
-                  <Button variant="outline" className="w-full">
+                  <h3 className="text-xl font-semibold mb-4 text-white">{course.title}</h3>
+                  <Button variant="outline" className="w-full border-white/10 hover:bg-white/5 text-white">
                     View Details
                   </Button>
                 </div>
@@ -148,7 +148,7 @@ const Index = () => {
           </div>
           
           <div className="mt-12 text-center">
-            <Button size="lg" className="bg-flytbase-primary text-white">
+            <Button size="lg" className="bg-flytbase-secondary text-white hover:bg-flytbase-secondary/90">
               View All Courses
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
@@ -157,10 +157,10 @@ const Index = () => {
       </section>
       
       {/* Testimonial Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-flytbase-primary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-neutral-900">What Our Students Say</h2>
+            <h2 className="text-3xl font-bold text-white">What Our Students Say</h2>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -183,21 +183,21 @@ const Index = () => {
             ].map((testimonial, index) => (
               <Card 
                 key={index} 
-                className="border-none shadow-card hover-lift animate-fade-in"
+                className="border-none bg-[#1A1F2C] shadow-card hover-lift animate-fade-in"
                 style={{ '--delay': index * 0.1 + 4 } as React.CSSProperties}
               >
                 <CardContent className="p-6">
-                  <div className="mb-4 text-flytbase-primary">
+                  <div className="mb-4 text-flytbase-secondary">
                     {"★".repeat(5)}
                   </div>
-                  <p className="text-lg italic mb-6 text-neutral-700">"{testimonial.quote}"</p>
+                  <p className="text-lg italic mb-6 text-neutral-300">"{testimonial.quote}"</p>
                   <div className="flex items-center">
-                    <div className="h-12 w-12 rounded-full bg-neutral-200 flex items-center justify-center text-neutral-500 font-bold text-xl">
+                    <div className="h-12 w-12 rounded-full bg-flytbase-secondary/20 flex items-center justify-center text-flytbase-secondary font-bold text-xl">
                       {testimonial.name.charAt(0)}
                     </div>
                     <div className="ml-4">
-                      <p className="font-semibold">{testimonial.name}</p>
-                      <p className="text-sm text-neutral-500">{testimonial.title}</p>
+                      <p className="font-semibold text-white">{testimonial.name}</p>
+                      <p className="text-sm text-neutral-400">{testimonial.title}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -208,14 +208,14 @@ const Index = () => {
       </section>
       
       {/* CTA Section */}
-      <section className="py-12 bg-flytbase-primary text-white">
+      <section className="py-12 bg-flytbase-secondary text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Your Drone Journey?</h2>
           <p className="text-xl mb-8 max-w-3xl mx-auto text-blue-100">
             Join thousands of students who have advanced their careers with FlytBase Academy
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" className="bg-white text-flytbase-primary hover:bg-blue-50">
+            <Button size="lg" className="bg-white text-flytbase-secondary hover:bg-blue-50">
               Get Started Today
             </Button>
             <Button variant="outline" size="lg" className="bg-transparent border-white text-white hover:bg-white/10">
@@ -225,7 +225,7 @@ const Index = () => {
         </div>
       </section>
       
-      <footer className="bg-neutral-900 text-neutral-400 py-12">
+      <footer className="bg-[#0A0F18] text-neutral-400 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
@@ -255,9 +255,9 @@ const Index = () => {
                 <input 
                   type="email" 
                   placeholder="Your email" 
-                  className="bg-neutral-800 text-white px-4 py-2 rounded-l-md focus:outline-none flex-1"
+                  className="bg-[#1A1F2C] text-white px-4 py-2 rounded-l-md focus:outline-none flex-1"
                 />
-                <Button className="rounded-l-none">
+                <Button className="rounded-l-none bg-flytbase-secondary hover:bg-flytbase-secondary/90">
                   Subscribe
                 </Button>
               </div>

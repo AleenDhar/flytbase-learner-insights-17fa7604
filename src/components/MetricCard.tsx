@@ -57,15 +57,15 @@ const MetricCard = ({
   return (
     <div 
       className={cn(
-        "card overflow-hidden hover-lift transition-all duration-300",
+        "card overflow-hidden hover-lift transition-all duration-300 bg-[#1A1F2C] border-white/5",
         className
       )}
       style={{ '--delay': index } as React.CSSProperties}
     >
       <div className="flex justify-between items-start">
         <div className="space-y-2">
-          <p className="text-neutral-500 text-sm font-medium">{title}</p>
-          <p className="text-2xl sm:text-3xl font-semibold text-neutral-900 metric-appear">
+          <p className="text-neutral-400 text-sm font-medium">{title}</p>
+          <p className="text-2xl sm:text-3xl font-semibold text-white metric-appear">
             {displayValue}
           </p>
           
@@ -75,8 +75,8 @@ const MetricCard = ({
                 className={cn(
                   "text-xs font-medium rounded-full px-2 py-0.5 flex items-center",
                   trend.isPositive 
-                    ? "text-green-700 bg-green-50" 
-                    : "text-red-700 bg-red-50"
+                    ? "text-green-200 bg-green-900/40" 
+                    : "text-red-200 bg-red-900/40"
                 )}
               >
                 {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
@@ -85,7 +85,7 @@ const MetricCard = ({
           )}
         </div>
         
-        <div className="p-3 rounded-lg bg-flytbase-light text-flytbase-primary">
+        <div className="p-3 rounded-lg bg-[#222631] text-white">
           {icon}
         </div>
       </div>

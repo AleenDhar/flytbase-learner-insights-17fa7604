@@ -91,7 +91,7 @@ const Courses = () => {
   });
 
   return (
-    <div className="min-h-screen bg-flytbase-light">
+    <div className="min-h-screen bg-flytbase-primary">
       <Navigation />
       
       {/* Header */}
@@ -126,14 +126,14 @@ const Courses = () => {
       </section>
       
       {/* Search Bar */}
-      <div className="bg-white border-b border-neutral-200 sticky top-16 z-10">
+      <div className="bg-[#1A1F2C] border-b border-white/5 sticky top-16 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 h-5 w-5" />
             <Input
               type="text"
               placeholder="Search courses by title or description..."
-              className="pl-10 w-full"
+              className="pl-10 w-full bg-[#222631] border-white/10 text-white"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -142,7 +142,7 @@ const Courses = () => {
       </div>
       
       {/* Course Grid */}
-      <section className="py-12">
+      <section className="py-12 bg-flytbase-primary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {filteredCourses.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -153,8 +153,8 @@ const Courses = () => {
           ) : (
             <div className="text-center py-16">
               <BookOpen className="mx-auto h-12 w-12 text-neutral-300" />
-              <h3 className="mt-4 text-lg font-medium text-neutral-900">No courses found</h3>
-              <p className="mt-1 text-neutral-500">Try adjusting your search or filter to find what you're looking for.</p>
+              <h3 className="mt-4 text-lg font-medium text-white">No courses found</h3>
+              <p className="mt-1 text-neutral-400">Try adjusting your search or filter to find what you're looking for.</p>
               <Button 
                 className="mt-6 bg-flytbase-secondary hover:bg-flytbase-secondary/90"
                 onClick={() => {

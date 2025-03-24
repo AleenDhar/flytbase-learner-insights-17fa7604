@@ -24,12 +24,14 @@ serve(async (req) => {
       );
     }
 
-    // First, fetch the video page to get the captions track URL
-    const videoPageResponse = await fetch(`https://www.youtube.com/watch?v=${videoId}`);
-    const videoPageHtml = await videoPageResponse.text();
-
-    // Extract captions data from the page
-    const transcript = await extractTranscriptFromPage(videoPageHtml, videoId);
+    // First, try to get transcript directly from timedtext API
+    let transcript = await fetchTimedTextTranscriptDirect(videoId);
+    
+    // If direct method fails, try the page parsing approach
+    if (!transcript || transcript.length === 0) {
+      console.log("Direct transcript fetch failed, trying page parsing approach...");
+      transcript = await fetchTranscriptFromPage(videoId);
+    }
 
     if (!transcript || transcript.length === 0) {
       return new Response(
@@ -57,20 +59,133 @@ serve(async (req) => {
   }
 });
 
-async function extractTranscriptFromPage(html: string, videoId: string): Promise<any[]> {
+// Direct approach - fetch from timedtext API without page parsing
+async function fetchTimedTextTranscriptDirect(videoId: string): Promise<any[]> {
   try {
+    // First try to get available transcript info
+    const infoUrl = `https://www.youtube.com/api/timedtext?type=list&v=${videoId}`;
+    const infoResponse = await fetch(infoUrl);
+    
+    if (!infoResponse.ok) {
+      console.error(`Failed to fetch transcript info: ${infoResponse.status}`);
+      return [];
+    }
+    
+    const infoText = await infoResponse.text();
+    
+    // Try to get the first available language
+    const langMatch = infoText.match(/lang_code="([^"]+)"/);
+    if (!langMatch) {
+      console.log("No language codes found in transcript info");
+      return [];
+    }
+    
+    const langCode = langMatch[1];
+    
+    // Fetch the transcript with the identified language
+    const transcriptUrl = `https://www.youtube.com/api/timedtext?lang=${langCode}&v=${videoId}&fmt=json3`;
+    const transcriptResponse = await fetch(transcriptUrl);
+    
+    if (!transcriptResponse.ok) {
+      console.error(`Failed to fetch transcript: ${transcriptResponse.status}`);
+      return [];
+    }
+    
+    try {
+      // Try JSON format first (newer videos)
+      const transcriptData = await transcriptResponse.json();
+      
+      if (transcriptData.events) {
+        return transcriptData.events
+          .filter((event: any) => event.segs && event.segs.length > 0)
+          .map((event: any) => {
+            const text = event.segs
+              .map((seg: any) => seg.utf8 || '')
+              .join('')
+              .trim();
+            
+            return {
+              text,
+              start: event.tStartMs / 1000,
+              duration: (event.dDurationMs || 1000) / 1000
+            };
+          })
+          .filter((segment: any) => segment.text.length > 0);
+      }
+    } catch (e) {
+      // If JSON parsing fails, try XML format (older videos)
+      console.log("JSON parsing failed, trying XML format");
+      
+      const xmlUrl = `https://www.youtube.com/api/timedtext?lang=${langCode}&v=${videoId}`;
+      const xmlResponse = await fetch(xmlUrl);
+      
+      if (!xmlResponse.ok) {
+        console.error(`Failed to fetch XML transcript: ${xmlResponse.status}`);
+        return [];
+      }
+      
+      const xmlText = await xmlResponse.text();
+      
+      // Parse the XML
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+      const textElements = xmlDoc.getElementsByTagName("text");
+      
+      // Convert to our expected format
+      const transcript = [];
+      for (let i = 0; i < textElements.length; i++) {
+        const element = textElements[i];
+        const start = parseFloat(element.getAttribute("start") || "0");
+        const duration = parseFloat(element.getAttribute("dur") || "0");
+        const text = element.textContent || "";
+        
+        transcript.push({
+          text: text.trim(),
+          start,
+          duration
+        });
+      }
+      
+      return transcript;
+    }
+    
+    return [];
+  } catch (error) {
+    console.error("Error in direct transcript fetch method:", error);
+    return [];
+  }
+}
+
+// Page parsing approach - fetch the YouTube page and extract transcript data
+async function fetchTranscriptFromPage(videoId: string): Promise<any[]> {
+  try {
+    // Fetch the video page
+    const videoPageResponse = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+      }
+    });
+    
+    if (!videoPageResponse.ok) {
+      console.error(`Failed to fetch video page: ${videoPageResponse.status}`);
+      return [];
+    }
+    
+    const videoPageHtml = await videoPageResponse.text();
+    
     // Extract the serializedShareEntity parameter which contains video metadata
-    const playerResponseMatch = html.match(/"playerCaptionsTracklistRenderer":({.+?}),"/);
+    const playerResponseMatch = videoPageHtml.match(/"playerCaptionsTracklistRenderer":({.+?}),"/);
     
     if (!playerResponseMatch) {
-      // Try an alternative method by fetching the timedtext directly
-      return await fetchTimedTextTranscript(videoId);
+      console.log("Failed to extract captions data from page");
+      return [];
     }
     
     // Extract captions data
-    const captionsMatch = html.match(/"captionTracks":\[(.*?)\]/);
+    const captionsMatch = videoPageHtml.match(/"captionTracks":\[(.*?)\]/);
     if (!captionsMatch || captionsMatch.length < 2) {
-      return await fetchTimedTextTranscript(videoId);
+      console.log("No caption tracks found in page data");
+      return [];
     }
     
     // Extract the URL for the first English caption track
@@ -78,7 +193,8 @@ async function extractTranscriptFromPage(html: string, videoId: string): Promise
     const urlMatch = captionsData.match(/"baseUrl":"(.*?)"/);
     
     if (!urlMatch || urlMatch.length < 2) {
-      return await fetchTimedTextTranscript(videoId);
+      console.log("No baseUrl found in caption tracks");
+      return [];
     }
     
     // Fetch and parse the transcript file
@@ -87,7 +203,8 @@ async function extractTranscriptFromPage(html: string, videoId: string): Promise
     
     const transcriptResponse = await fetch(transcriptUrl);
     if (!transcriptResponse.ok) {
-      return await fetchTimedTextTranscript(videoId);
+      console.error(`Failed to fetch transcript data: ${transcriptResponse.status}`);
+      return [];
     }
     
     const transcriptData = await transcriptResponse.json();
@@ -111,57 +228,9 @@ async function extractTranscriptFromPage(html: string, videoId: string): Promise
         .filter((segment: any) => segment.text.length > 0);
     }
     
-    return await fetchTimedTextTranscript(videoId);
+    return [];
   } catch (error) {
-    console.error("Error extracting transcript from page:", error);
-    return await fetchTimedTextTranscript(videoId);
-  }
-}
-
-// Fallback method to get transcript using the timedtext API
-async function fetchTimedTextTranscript(videoId: string): Promise<any[]> {
-  try {
-    // First try to get available transcript info
-    const infoUrl = `https://www.youtube.com/api/timedtext?type=list&v=${videoId}`;
-    const infoResponse = await fetch(infoUrl);
-    const infoText = await infoResponse.text();
-    
-    // Try to get the first available language
-    const langMatch = infoText.match(/lang_code="([^"]+)"/);
-    if (!langMatch) {
-      return [];
-    }
-    
-    const langCode = langMatch[1];
-    
-    // Fetch the transcript with the identified language
-    const transcriptUrl = `https://www.youtube.com/api/timedtext?lang=${langCode}&v=${videoId}`;
-    const transcriptResponse = await fetch(transcriptUrl);
-    const transcriptXml = await transcriptResponse.text();
-    
-    // Parse the XML
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(transcriptXml, "text/xml");
-    const textElements = xmlDoc.getElementsByTagName("text");
-    
-    // Convert to our expected format
-    const transcript = [];
-    for (let i = 0; i < textElements.length; i++) {
-      const element = textElements[i];
-      const start = parseFloat(element.getAttribute("start") || "0");
-      const duration = parseFloat(element.getAttribute("dur") || "0");
-      const text = element.textContent || "";
-      
-      transcript.push({
-        text: text.trim(),
-        start,
-        duration
-      });
-    }
-    
-    return transcript;
-  } catch (error) {
-    console.error("Error in fallback transcript method:", error);
+    console.error("Error in page parsing transcript method:", error);
     return [];
   }
 }

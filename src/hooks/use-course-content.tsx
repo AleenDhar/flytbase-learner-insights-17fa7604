@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { fetchTranscript } from '@/utils/youtube/fetchTranscript';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 interface Question {
   question: string;
@@ -14,6 +15,8 @@ interface CourseContent {
   questions: Question[] | null;
   loading: boolean;
   error: string | null;
+  retryCount: number;
+  retry: () => void;
 }
 
 export const useCourseContent = (videoId: string | undefined) => {
@@ -21,58 +24,74 @@ export const useCourseContent = (videoId: string | undefined) => {
     summary: null,
     questions: null,
     loading: false,
-    error: null
+    error: null,
+    retryCount: 0,
+    retry: () => {}
   });
+
+  const fetchContent = async (videoId: string, retryCount: number) => {
+    setContent(prev => ({ ...prev, loading: true, error: null }));
+    
+    try {
+      // 1. Fetch transcript
+      const transcript = await fetchTranscript(videoId);
+      
+      if (!transcript) {
+        throw new Error('Failed to fetch transcript for this video. The video might not have captions available.');
+      }
+      
+      // 2. Generate summary
+      const summaryResponse = await supabase.functions.invoke('generate-course-content', {
+        body: { transcript, contentType: 'summary' }
+      });
+      
+      if (summaryResponse.error) {
+        throw new Error(`Failed to generate summary: ${summaryResponse.error.message}`);
+      }
+      
+      // 3. Generate questions
+      const questionsResponse = await supabase.functions.invoke('generate-course-content', {
+        body: { transcript, contentType: 'questions' }
+      });
+      
+      if (questionsResponse.error) {
+        throw new Error(`Failed to generate questions: ${questionsResponse.error.message}`);
+      }
+      
+      setContent({
+        summary: summaryResponse.data.summary,
+        questions: questionsResponse.data.questions,
+        loading: false,
+        error: null,
+        retryCount,
+        retry: () => fetchContent(videoId, retryCount + 1)
+      });
+    } catch (error) {
+      console.error('Error fetching course content:', error);
+      
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      
+      // Show error toast to user
+      toast({
+        title: "Content Generation Failed",
+        description: errorMessage,
+        variant: "destructive"
+      });
+      
+      setContent(prev => ({
+        ...prev,
+        loading: false,
+        error: errorMessage,
+        retryCount,
+        retry: () => fetchContent(videoId, retryCount + 1)
+      }));
+    }
+  };
 
   useEffect(() => {
     if (!videoId) return;
-
-    const fetchContent = async () => {
-      setContent(prev => ({ ...prev, loading: true, error: null }));
-      
-      try {
-        // 1. Fetch transcript
-        const transcript = await fetchTranscript(videoId);
-        
-        if (!transcript) {
-          throw new Error('Failed to fetch transcript for this video');
-        }
-        
-        // 2. Generate summary
-        const summaryResponse = await supabase.functions.invoke('generate-course-content', {
-          body: { transcript, contentType: 'summary' }
-        });
-        
-        if (summaryResponse.error) {
-          throw new Error(`Failed to generate summary: ${summaryResponse.error.message}`);
-        }
-        
-        // 3. Generate questions
-        const questionsResponse = await supabase.functions.invoke('generate-course-content', {
-          body: { transcript, contentType: 'questions' }
-        });
-        
-        if (questionsResponse.error) {
-          throw new Error(`Failed to generate questions: ${questionsResponse.error.message}`);
-        }
-        
-        setContent({
-          summary: summaryResponse.data.summary,
-          questions: questionsResponse.data.questions,
-          loading: false,
-          error: null
-        });
-      } catch (error) {
-        console.error('Error fetching course content:', error);
-        setContent(prev => ({
-          ...prev,
-          loading: false,
-          error: error instanceof Error ? error.message : 'An unknown error occurred'
-        }));
-      }
-    };
-
-    fetchContent();
+    
+    fetchContent(videoId, 0);
   }, [videoId]);
 
   return content;

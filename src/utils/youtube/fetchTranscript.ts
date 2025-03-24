@@ -16,16 +16,60 @@ export interface TranscriptSegment {
  */
 export const fetchTranscript = async (videoId: string): Promise<TranscriptSegment[] | null> => {
   try {
-    // Use our custom Supabase Edge Function to fetch the transcript
-    const response = await fetch(`https://api.supabase.flytbase.com/functions/v1/get-youtube-transcript?videoId=${videoId}`);
+    // Make 3 attempts to fetch the transcript with exponential backoff
+    let attempt = 0;
+    const maxAttempts = 3;
+    let lastError: any = null;
     
-    if (!response.ok) {
-      console.error('Failed to fetch transcript:', response.statusText);
-      return null;
+    while (attempt < maxAttempts) {
+      try {
+        // Add timestamp to prevent caching issues
+        const timestamp = new Date().getTime();
+        const response = await fetch(
+          `https://api.supabase.flytbase.com/functions/v1/get-youtube-transcript?videoId=${videoId}&_=${timestamp}`,
+          {
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+              'Expires': '0'
+            }
+          }
+        );
+        
+        if (!response.ok) {
+          console.error(`Attempt ${attempt + 1}/${maxAttempts} - Failed to fetch transcript:`, response.statusText);
+          throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          console.error(`Attempt ${attempt + 1}/${maxAttempts} - Error from transcript API:`, data.error);
+          throw new Error(data.error);
+        }
+        
+        if (!data.transcript || data.transcript.length === 0) {
+          console.error(`Attempt ${attempt + 1}/${maxAttempts} - No transcript segments returned`);
+          throw new Error('No transcript segments returned');
+        }
+        
+        return data.transcript;
+      } catch (error) {
+        lastError = error;
+        attempt++;
+        
+        if (attempt < maxAttempts) {
+          // Exponential backoff: 1s, 2s, 4s...
+          const delay = Math.pow(2, attempt - 1) * 1000;
+          console.log(`Retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
     }
     
-    const data = await response.json();
-    return data.transcript;
+    // If we're here, all attempts failed
+    console.error('All transcript fetch attempts failed:', lastError);
+    return null;
   } catch (error) {
     console.error('Error fetching transcript:', error);
     return null;

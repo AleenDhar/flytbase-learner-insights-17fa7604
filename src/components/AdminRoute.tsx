@@ -114,4 +114,4 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
   return <>{children}</>;
 };
 
-export { AdminRoute as default, ADMIN_EMAILS };
+export default AdminRoute;

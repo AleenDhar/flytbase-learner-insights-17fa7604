@@ -16,10 +16,7 @@ export interface TranscriptSegment {
  */
 export const fetchTranscript = async (videoId: string): Promise<TranscriptSegment[] | null> => {
   try {
-    // YouTube doesn't provide an official API for transcripts, 
-    // so we'll need to use a third-party service or alternative approach
-    
-    // For now, we'll implement a basic fetch from an API that can extract YouTube transcripts
+    // Use our custom Supabase Edge Function to fetch the transcript
     const response = await fetch(`https://api.supabase.flytbase.com/functions/v1/get-youtube-transcript?videoId=${videoId}`);
     
     if (!response.ok) {

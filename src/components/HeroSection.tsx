@@ -9,17 +9,17 @@ const HeroSection = () => {
     <section className="relative bg-flytbase-primary text-white py-20 overflow-hidden">
       <div className="absolute inset-0 z-0">
         <img 
-          src="/lovable-uploads/81336c33-e88e-438a-88d5-4a46b642b76e.png" 
+          src="/lovable-uploads/c9cca1b7-22a0-4793-9b9b-aec57fef1c70.png" 
           alt="Drone background" 
-          className="w-full h-full object-cover opacity-40"
-          style={{ maxWidth: '100%', height: '100%', objectPosition: 'center right' }}
+          className="w-full h-full object-cover opacity-30"
+          style={{ maxWidth: '100%', height: '100%' }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-flytbase-primary via-flytbase-primary/90 to-flytbase-primary/30"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-flytbase-primary via-flytbase-primary/80 to-transparent"></div>
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="md:flex md:items-center md:justify-between">
           <div className="md:w-3/5 animate-fade-in" style={{ '--delay': '0' } as React.CSSProperties}>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">Your Journey to <span className="text-[#FA8500]">Drone Autonomy</span> Starts Here</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">Your Journey to <span className="text-[#ffab49]">Drone Autonomy</span> Starts Here</h1>
             <p className="text-xl mb-8 text-blue-100">Become a certified drone expert with our industry-leading courses and hands-on training</p>
             <div className="flex flex-wrap gap-4">
               <Button size="lg" className="bg-white text-flytbase-primary hover:bg-blue-50" asChild>

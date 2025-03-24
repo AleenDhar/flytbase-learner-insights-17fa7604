@@ -7,11 +7,12 @@ import { ArrowRight } from 'lucide-react';
 const HeroSection = () => {
   return (
     <section className="relative bg-flytbase-primary text-white py-20 overflow-hidden">
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 z-0">
         <img 
           src="/lovable-uploads/c9cca1b7-22a0-4793-9b9b-aec57fef1c70.png" 
           alt="Drone background" 
           className="w-full h-full object-cover opacity-30"
+          style={{ maxWidth: '100%', height: '100%' }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-flytbase-primary via-flytbase-primary/80 to-transparent"></div>
       </div>

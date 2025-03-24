@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Clock, Youtube } from 'lucide-react';
+import { BookOpen, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export interface CourseProps {
@@ -14,7 +14,7 @@ export interface CourseProps {
   duration: string;
   modules: number;
   thumbnail: string;
-  youtubePlaylistId?: string; // Make this optional
+  youtubePlaylistId?: string; // Keep the property but don't display it
 }
 
 const CourseCard = ({
@@ -54,12 +54,6 @@ const CourseCard = ({
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <Badge className={`${getBadgeVariant(level)}`}>{level}</Badge>
-          {youtubePlaylistId && (
-            <Badge variant="outline" className="border-white/10 text-white/70 flex items-center">
-              <Youtube className="mr-1 h-3 w-3" />
-              Playlist
-            </Badge>
-          )}
         </div>
         <h3 className="text-xl font-semibold mt-2 text-white">{title}</h3>
       </CardHeader>

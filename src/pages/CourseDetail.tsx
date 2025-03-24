@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
@@ -7,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
+import WatchlistButton from '@/components/WatchlistButton';
 import { 
   ArrowLeft, 
   BookOpen, 
@@ -17,7 +17,6 @@ import {
   CheckCircle,
   ChevronDown,
   ChevronUp,
-  Youtube,
   Info,
   AlertCircle,
   Video
@@ -42,7 +41,6 @@ interface ModuleData {
   playlistId?: string;
 }
 
-// Default modules data to use when no playlist is available
 const defaultModulesData: ModuleData[] = [
   { 
     title: "Introduction to Drones", 
@@ -93,13 +91,11 @@ const CourseDetail = () => {
   const [hasPlaylist, setHasPlaylist] = useState(false);
   const [playlistId, setPlaylistId] = useState<string | undefined>(undefined);
 
-  // Find the course data first
   useEffect(() => {
     const foundCourse = coursesData.find(c => c.id === courseId) || null;
     setCourse(foundCourse);
     setIsLoading(true);
     
-    // Check if course has a playlist
     if (foundCourse && foundCourse.youtubePlaylistId) {
       setHasPlaylist(true);
       setPlaylistId(foundCourse.youtubePlaylistId);
@@ -111,14 +107,11 @@ const CourseDetail = () => {
     }
   }, [courseId]);
 
-  // Only run the YouTube hook when we have a playlist ID
   const { videos, loading, error } = useYouTubePlaylist(playlistId);
 
-  // Process videos into modules after they're loaded
   useEffect(() => {
     if (!hasPlaylist || !course) return;
 
-    // Only proceed if we have videos and we're not still loading
     if (!loading) {
       if (videos.length > 0) {
         console.log(`Processing ${videos.length} videos for course modules`);
@@ -138,10 +131,8 @@ const CourseDetail = () => {
         setModulesData(playlistModules);
         setIsLoading(false);
       } else if (error) {
-        // If there was an error loading the playlist, fall back to default modules
         console.error("Using default modules due to YouTube API error:", error);
         
-        // Only show a toast if it's not an API key error (already handled in the YouTube hook)
         if (!error.includes('API key')) {
           toast({
             title: "Error Loading Content",
@@ -153,7 +144,6 @@ const CourseDetail = () => {
         setModulesData(defaultModulesData);
         setIsLoading(false);
       } else {
-        // No videos found but no error either (empty playlist)
         console.log("No videos found in playlist, using default modules");
         setModulesData(defaultModulesData);
         setIsLoading(false);
@@ -210,17 +200,14 @@ const CourseDetail = () => {
                   <Award className="mr-2 h-5 w-5" />
                   <span>Certificate on Completion</span>
                 </div>
-                {course.youtubePlaylistId && (
-                  <div className="flex items-center text-neutral-300">
-                    <Youtube className="mr-2 h-5 w-5" />
-                    <span>YouTube Playlist</span>
-                  </div>
-                )}
               </div>
 
-              <Button size="lg" className="bg-flytbase-accent-orange text-white hover:bg-flytbase-accent-orange/90">
-                Enroll Now
-              </Button>
+              <div className="flex gap-2">
+                <Button size="lg" className="bg-flytbase-accent-orange text-white hover:bg-flytbase-accent-orange/90">
+                  Enroll Now
+                </Button>
+                <WatchlistButton courseId={courseId || ""} variant="outline" />
+              </div>
             </div>
             
             <div className="hidden md:block">
@@ -382,20 +369,6 @@ const CourseDetail = () => {
                       <p className="text-white/70 mb-6">
                         {modulesData[activeModule].description}
                       </p>
-                      
-                      {course.youtubePlaylistId && (
-                        <div className="mb-6">
-                          <a 
-                            href={`https://www.youtube.com/playlist?list=${course.youtubePlaylistId}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center text-flytbase-accent-orange hover:text-flytbase-accent-orange/90 transition-colors"
-                          >
-                            <Youtube className="mr-2 h-5 w-5" />
-                            View Full YouTube Playlist
-                          </a>
-                        </div>
-                      )}
                       
                       <Separator className="my-6 bg-white/10" />
                       

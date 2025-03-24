@@ -5,9 +5,13 @@ import { Link } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import BrandLogo from '@/components/BrandLogo';
 import TestimonialSlider from '@/components/TestimonialSlider';
-import { BookOpen, Award, Layers, Users, ArrowRight } from 'lucide-react';
+import { BookOpen, Award, Layers, Users, ArrowRight, Clock } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import UserCourses from '@/components/UserCourses';
 
 const Index = () => {
+  const { user } = useAuth();
+  
   return (
     <div className="min-h-screen bg-neutral-100">
       <Navigation />
@@ -48,6 +52,22 @@ const Index = () => {
           </div>
         </div>
       </section>
+      
+      {/* Continue Learning Section (for signed-in users) */}
+      {user && (
+        <section className="py-12 bg-[#121723]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-white flex items-center">
+                <Clock className="mr-2 h-5 w-5" /> Continue Learning
+              </h2>
+              <p className="text-neutral-400 mt-1">Pick up where you left off</p>
+            </div>
+            
+            <UserCourses type="in_progress" limit={3} showViewAll={true} />
+          </div>
+        </section>
+      )}
       
       {/* Features Section */}
       <section className="py-16 bg-flytbase-primary text-white">

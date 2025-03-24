@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Play, BookOpen, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
+import WatchlistButton from './WatchlistButton';
 
 export interface CourseProps {
   id: string;
@@ -27,6 +29,8 @@ const CourseCard: React.FC<CourseProps> = ({
   thumbnail,
   youtubePlaylistId
 }) => {
+  const { user } = useAuth();
+  
   const getLevelColor = (level: string) => {
     switch(level) {
       case 'Beginner': return 'bg-green-900/40 text-green-200 hover:bg-green-900/60';
@@ -63,12 +67,17 @@ const CourseCard: React.FC<CourseProps> = ({
         </div>
         <h3 className="text-xl font-semibold mb-2 line-clamp-2 text-white">{title}</h3>
         <p className="text-neutral-300 mb-4 line-clamp-3">{description}</p>
-        <Link to={`/courses/${id}`}>
-          <Button className="w-full group bg-flytbase-secondary hover:bg-flytbase-secondary/90">
-            View Course
-            <ArrowRight className="ml-2 h-4 w-4 transform transition-transform group-hover:translate-x-1" />
-          </Button>
-        </Link>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Link to={`/courses/${id}`} className="flex-1">
+            <Button className="w-full group bg-flytbase-secondary hover:bg-flytbase-secondary/90">
+              View Course
+              <ArrowRight className="ml-2 h-4 w-4 transform transition-transform group-hover:translate-x-1" />
+            </Button>
+          </Link>
+          {user && (
+            <WatchlistButton courseId={id} />
+          )}
+        </div>
       </CardContent>
     </Card>
   );

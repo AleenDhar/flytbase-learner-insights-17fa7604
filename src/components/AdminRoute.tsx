@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -33,7 +34,8 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
       }
 
       // Check if user's email is in admin list
-      if (user.email && ADMIN_EMAILS.includes(user.email)) {
+      const email = user.email?.toLowerCase();
+      if (email && ADMIN_EMAILS.includes(email)) {
         console.log("User email is in admin list");
         setIsAdmin(true);
         setCheckingAdmin(false);

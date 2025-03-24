@@ -20,18 +20,29 @@ const SignIn = () => {
   // Redirect to dashboard if already signed in
   if (!isLoading && user) {
     // Check if user is admin to redirect them appropriately
-    const isAdmin = user.email && ADMIN_EMAILS.includes(user.email) || 
+    const isAdmin = user.email && ADMIN_EMAILS.map(email => email.toLowerCase()).includes(user.email.toLowerCase()) || 
                    (user.app_metadata && user.app_metadata.role === 'admin');
     
     // Get admin view preference
-    const viewAsUser = localStorage.getItem("admin-view-as-user") === "true";
+    let viewAsUser = false;
+    try {
+      viewAsUser = localStorage.getItem("admin-view-as-user") === "true";
+    } catch (e) {
+      console.error("Error reading from localStorage:", e);
+    }
+    
+    console.log("User is authenticated:", user.email);
+    console.log("Is admin:", isAdmin);
+    console.log("View as user:", viewAsUser);
     
     // If user is admin and not viewing as user, go to admin dashboard
     if (isAdmin && !viewAsUser) {
+      console.log("Redirecting to admin dashboard");
       return <Navigate to="/admin" replace />;
     }
     
     // Otherwise go to regular dashboard
+    console.log("Redirecting to user dashboard");
     return <Navigate to="/dashboard" replace />;
   }
   
@@ -55,16 +66,34 @@ const SignIn = () => {
 
       if (error) throw error;
       
+      console.log("Sign in successful for:", data.user?.email);
+      
       // Check if user is admin to redirect appropriately
-      const isAdmin = data.user?.email && ADMIN_EMAILS.includes(data.user.email) || 
+      const isAdmin = data.user?.email && 
+                    ADMIN_EMAILS.map(email => email.toLowerCase()).includes(data.user.email.toLowerCase()) || 
                     (data.user?.app_metadata && data.user.app_metadata.role === 'admin');
       
+      console.log("Is admin:", isAdmin);
+      
       // Get admin view preference
-      const viewAsUser = localStorage.getItem("admin-view-as-user") === "true";
+      let viewAsUser = false;
+      try {
+        viewAsUser = localStorage.getItem("admin-view-as-user") === "true";
+      } catch (e) {
+        console.error("Error reading from localStorage:", e);
+      }
+      console.log("View as user:", viewAsUser);
+      
+      // Set a default value for admin view if not set yet
+      if (isAdmin && localStorage.getItem("admin-view-as-user") === null) {
+        localStorage.setItem("admin-view-as-user", "false");
+      }
       
       if (isAdmin && !viewAsUser) {
+        console.log("Navigating to admin dashboard");
         navigate('/admin');
       } else {
+        console.log("Navigating to user dashboard");
         navigate('/dashboard');
       }
     } catch (error: any) {

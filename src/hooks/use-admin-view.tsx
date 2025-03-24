@@ -2,14 +2,24 @@
 import { useState, useEffect } from 'react';
 
 export function useAdminView() {
-  const [viewAsUser, setViewAsUser] = useState(() => {
-    const saved = localStorage.getItem("admin-view-as-user");
-    return saved === "true";
+  const [viewAsUser, setViewAsUser] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem("admin-view-as-user");
+      return saved === "true";
+    } catch (e) {
+      console.error("Error reading from localStorage:", e);
+      return false;
+    }
   });
   
   useEffect(() => {
-    // Ensure localStorage is updated when viewAsUser changes
-    localStorage.setItem("admin-view-as-user", viewAsUser ? "true" : "false");
+    try {
+      // Ensure localStorage is updated when viewAsUser changes
+      localStorage.setItem("admin-view-as-user", viewAsUser ? "true" : "false");
+      console.log("Admin view preference updated:", viewAsUser ? "viewing as user" : "viewing as admin");
+    } catch (e) {
+      console.error("Error writing to localStorage:", e);
+    }
   }, [viewAsUser]);
   
   const toggleView = () => {

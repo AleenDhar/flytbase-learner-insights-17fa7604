@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -30,7 +29,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="md:flex md:items-center md:justify-between">
             <div className="md:w-3/5 animate-fade-in" style={{ '--delay': '0' } as React.CSSProperties}>
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">Your Journey to Drone Autonomy Starts Here</h1>
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">Your Journey to <span className="text-[#ffab49]">Drone Autonomy</span> Starts Here</h1>
               <p className="text-xl mb-8 text-blue-100">Become a certified drone expert with our industry-leading courses and hands-on training</p>
               <div className="flex flex-wrap gap-4">
                 <Button size="lg" className="bg-white text-flytbase-primary hover:bg-blue-50" asChild>

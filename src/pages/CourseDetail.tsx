@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
@@ -47,14 +48,23 @@ const CourseDetail = () => {
   const [modulesData, setModulesData] = useState<ModuleData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Find the course data first
   useEffect(() => {
     const foundCourse = coursesData.find(c => c.id === courseId) || null;
     setCourse(foundCourse);
     setIsLoading(true);
+    
+    // If we have no course or no playlist, set default modules
+    if (!foundCourse || !foundCourse.youtubePlaylistId) {
+      setModulesData(defaultModulesData);
+      setIsLoading(false);
+    }
   }, [courseId]);
 
+  // Now the YouTube hook will only run after we have a course with a playlistId
   const { videos, loading, error } = useYouTubePlaylist(course?.youtubePlaylistId);
 
+  // Process videos into modules after they're loaded
   useEffect(() => {
     if (!course) return;
 
@@ -74,9 +84,6 @@ const CourseDetail = () => {
       }));
       
       setModulesData(playlistModules);
-      setIsLoading(false);
-    } else if (!course.youtubePlaylistId) {
-      setModulesData(defaultModulesData);
       setIsLoading(false);
     }
   }, [course, videos]);

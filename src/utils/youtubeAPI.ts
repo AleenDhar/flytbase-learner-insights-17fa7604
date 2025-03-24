@@ -63,9 +63,12 @@ export const useYouTubePlaylist = (playlistId: string | undefined) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Reset state on playlistId change to avoid stale data
+    setVideos([]);
+    setError(null);
+    
     // Don't fetch if no playlistId is provided
     if (!playlistId) {
-      setVideos([]);
       setLoading(false);
       return;
     }

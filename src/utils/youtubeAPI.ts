@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 
 // Interface for a single YouTube video item
@@ -56,12 +57,19 @@ export const formatDuration = (duration: string): string => {
  * @param playlistId YouTube playlist ID
  * @returns Object containing videos array and loading state
  */
-export const useYouTubePlaylist = (playlistId: string) => {
+export const useYouTubePlaylist = (playlistId: string | undefined) => {
   const [videos, setVideos] = useState<YouTubeVideo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Don't fetch if no playlistId is provided
+    if (!playlistId) {
+      setVideos([]);
+      setLoading(false);
+      return;
+    }
+
     const fetchPlaylistItems = async () => {
       try {
         setLoading(true);
@@ -143,9 +151,7 @@ export const useYouTubePlaylist = (playlistId: string) => {
       }
     };
 
-    if (playlistId) {
-      fetchPlaylistItems();
-    }
+    fetchPlaylistItems();
   }, [playlistId]);
 
   return { videos, loading, error };

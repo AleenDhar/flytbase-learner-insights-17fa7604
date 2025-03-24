@@ -53,9 +53,7 @@ const CourseDetail = () => {
     setIsLoading(true);
   }, [courseId]);
 
-  const { videos, loading, error } = course?.youtubePlaylistId 
-    ? useYouTubePlaylist(course.youtubePlaylistId) 
-    : { videos: [], loading: false, error: null };
+  const { videos, loading, error } = useYouTubePlaylist(course?.youtubePlaylistId);
 
   useEffect(() => {
     if (!course) return;
@@ -316,7 +314,7 @@ const CourseDetail = () => {
                 ) : (
                   <div className="aspect-video bg-[#0F1623] flex items-center justify-center">
                     <div className="text-center p-8">
-                      <Info className="h-12 w-12 text-white/40 mx-auto mb-4" />
+                      <Info className="h-10 w-10 text-white/40 mx-auto mb-3" />
                       <p className="text-white/60">No video content available</p>
                     </div>
                   </div>

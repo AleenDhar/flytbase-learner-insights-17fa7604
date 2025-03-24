@@ -19,9 +19,9 @@ const SignIn = () => {
   
   // Redirect to dashboard if already signed in
   if (!isLoading && user) {
-    // Check if user is admin to redirect them appropriately
-    const isAdmin = user.email && ADMIN_EMAILS.map(email => email.toLowerCase()).includes(user.email.toLowerCase()) || 
-                   (user.app_metadata && user.app_metadata.role === 'admin');
+    // Check if user is admin based on email (temporary fallback)
+    const isAdminByEmail = user.email && 
+                   ADMIN_EMAILS.map(email => email.toLowerCase()).includes(user.email.toLowerCase());
     
     // Get admin view preference
     let viewAsUser = false;
@@ -32,19 +32,50 @@ const SignIn = () => {
     }
     
     console.log("User is authenticated:", user.email);
-    console.log("Is admin:", isAdmin);
-    console.log("View as user:", viewAsUser);
     
+    // Check if user has admin role in database
+    const checkAdminRole = async () => {
+      try {
+        const { data: isAdmin, error } = await supabase.rpc('is_admin', { uid: user.id });
+        
+        if (error) {
+          console.error("Error checking admin role:", error);
+          // Fall back to email check
+          redirectUser(isAdminByEmail, viewAsUser);
+          return;
+        }
+        
+        console.log("Is admin (from database):", isAdmin);
+        redirectUser(isAdmin, viewAsUser);
+      } catch (error) {
+        console.error("Error in admin check:", error);
+        // Fall back to email check
+        redirectUser(isAdminByEmail, viewAsUser);
+      }
+    };
+    
+    // Check admin role immediately
+    checkAdminRole();
+    
+    // While checking, show loading spinner
+    return <div className="min-h-screen bg-flytbase-primary flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-flytbase-secondary"></div>
+    </div>;
+  }
+  
+  // Helper function to redirect user based on admin status
+  const redirectUser = (isAdmin: boolean, viewAsUser: boolean) => {
     // If user is admin and not viewing as user, go to admin dashboard
     if (isAdmin && !viewAsUser) {
       console.log("Redirecting to admin dashboard");
-      return <Navigate to="/admin" replace />;
+      navigate('/admin', { replace: true });
+      return;
     }
     
     // Otherwise go to regular dashboard
     console.log("Redirecting to user dashboard");
-    return <Navigate to="/dashboard" replace />;
-  }
+    navigate('/dashboard', { replace: true });
+  };
   
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,12 +99,9 @@ const SignIn = () => {
       
       console.log("Sign in successful for:", data.user?.email);
       
-      // Check if user is admin to redirect appropriately
-      const isAdmin = data.user?.email && 
-                    ADMIN_EMAILS.map(email => email.toLowerCase()).includes(data.user.email.toLowerCase()) || 
-                    (data.user?.app_metadata && data.user.app_metadata.role === 'admin');
-      
-      console.log("Is admin:", isAdmin);
+      // Check if user is admin based on email (temporary fallback)
+      const isAdminByEmail = data.user?.email && 
+                    ADMIN_EMAILS.map(email => email.toLowerCase()).includes(data.user.email.toLowerCase());
       
       // Get admin view preference
       let viewAsUser = false;
@@ -82,19 +110,29 @@ const SignIn = () => {
       } catch (e) {
         console.error("Error reading from localStorage:", e);
       }
-      console.log("View as user:", viewAsUser);
       
       // Set a default value for admin view if not set yet
-      if (isAdmin && localStorage.getItem("admin-view-as-user") === null) {
+      if (isAdminByEmail && localStorage.getItem("admin-view-as-user") === null) {
         localStorage.setItem("admin-view-as-user", "false");
       }
       
-      if (isAdmin && !viewAsUser) {
-        console.log("Navigating to admin dashboard");
-        navigate('/admin');
-      } else {
-        console.log("Navigating to user dashboard");
-        navigate('/dashboard');
+      // Check admin role in database
+      try {
+        const { data: isAdmin, error } = await supabase.rpc('is_admin', { uid: data.user.id });
+        
+        if (error) {
+          console.error("Error checking admin role:", error);
+          // Fall back to email check
+          redirectAfterSignIn(isAdminByEmail, viewAsUser);
+          return;
+        }
+        
+        console.log("Is admin (from database):", isAdmin);
+        redirectAfterSignIn(isAdmin, viewAsUser);
+      } catch (error) {
+        console.error("Error in admin check:", error);
+        // Fall back to email check
+        redirectAfterSignIn(isAdminByEmail, viewAsUser);
       }
     } catch (error: any) {
       toast({
@@ -104,6 +142,17 @@ const SignIn = () => {
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+  
+  // Helper function for redirecting after sign in
+  const redirectAfterSignIn = (isAdmin: boolean, viewAsUser: boolean) => {
+    if (isAdmin && !viewAsUser) {
+      console.log("Navigating to admin dashboard");
+      navigate('/admin');
+    } else {
+      console.log("Navigating to user dashboard");
+      navigate('/dashboard');
     }
   };
 

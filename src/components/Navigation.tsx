@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAdminView } from '@/hooks/use-admin-view';
 import { ADMIN_EMAILS } from './AdminRoute';
+import { supabase } from '@/integrations/supabase/client';
 
 const Navigation = () => {
   const location = useLocation();
@@ -27,14 +29,47 @@ const Navigation = () => {
   };
 
   useEffect(() => {
-    if (user?.email) {
-      // Check if user is admin
-      const isUserAdmin = ADMIN_EMAILS.includes(user.email) || 
-                         (user.app_metadata && user.app_metadata.role === 'admin');
-      setIsAdmin(isUserAdmin);
-    } else {
-      setIsAdmin(false);
-    }
+    const checkAdminStatus = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
+
+      try {
+        // Check database first for admin role
+        const { data, error } = await supabase.rpc('is_admin', { uid: user.id });
+        
+        if (error) {
+          console.error("Error checking admin status:", error);
+          // Fall back to email check
+          const isAdminByEmail = user.email && 
+                               ADMIN_EMAILS.map(email => email.toLowerCase()).includes(user.email.toLowerCase());
+          setIsAdmin(isAdminByEmail);
+          return;
+        }
+        
+        if (data) {
+          setIsAdmin(true);
+          return;
+        }
+        
+        // If not in database, check legacy methods
+        const isAdminByEmail = user.email && 
+                             ADMIN_EMAILS.map(email => email.toLowerCase()).includes(user.email.toLowerCase());
+        const isAdminByMetadata = user.app_metadata && user.app_metadata.role === 'admin';
+        
+        setIsAdmin(isAdminByEmail || isAdminByMetadata);
+      } catch (error) {
+        console.error("Error in admin check:", error);
+        
+        // Fall back to email check
+        const isAdminByEmail = user.email && 
+                             ADMIN_EMAILS.map(email => email.toLowerCase()).includes(user.email.toLowerCase());
+        setIsAdmin(isAdminByEmail);
+      }
+    };
+    
+    checkAdminStatus();
   }, [user]);
 
   // Define navigation items - only show public pages for non-authenticated users

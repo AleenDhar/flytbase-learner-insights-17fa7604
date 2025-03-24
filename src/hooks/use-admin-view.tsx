@@ -26,7 +26,7 @@ export function useAdminView() {
     const newValue = !viewAsUser;
     setViewAsUser(newValue);
     
-    // Reload or redirect based on new view
+    // Reload or redirect based on new view state
     if (newValue) {
       // If switching to user view, go to dashboard
       window.location.href = '/dashboard';
@@ -36,9 +36,22 @@ export function useAdminView() {
     }
   };
   
-  const isAdminViewingAsUser = () => {
-    return viewAsUser;
+  // This function allows direct setting of the view state
+  // Useful for navigation dropdown menu to return to admin view
+  const setAdminView = (viewingAsUser: boolean) => {
+    if (viewAsUser !== viewingAsUser) {
+      setViewAsUser(viewingAsUser);
+      if (viewingAsUser) {
+        window.location.href = '/dashboard';
+      } else {
+        window.location.href = '/admin';
+      }
+    }
   };
   
-  return { viewAsUser, toggleView, isAdminViewingAsUser };
+  return { 
+    viewAsUser, 
+    toggleView, 
+    setAdminView
+  };
 }

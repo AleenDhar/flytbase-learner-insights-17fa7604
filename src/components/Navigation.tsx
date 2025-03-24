@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -13,75 +14,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAdminView } from "@/hooks/use-admin-view";
-import { ADMIN_EMAILS } from "./AdminRoute";
+import { useAdminCheck } from "@/hooks/use-admin-check";
 import { supabase } from "@/integrations/supabase/client";
 
 const Navigation = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const { viewAsUser } = useAdminView();
+  const { isAdmin } = useAdminCheck();
+  const { viewAsUser, setAdminView } = useAdminView();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-
-  useEffect(() => {
-    const checkAdminStatus = async () => {
-      if (!user) {
-        setIsAdmin(false);
-        return;
-      }
-
-      try {
-        // Check database first for admin role
-        const { data, error } = await supabase.rpc("is_admin", {
-          uid: user.id,
-        });
-
-        if (error) {
-          console.error("Error checking admin status:", error);
-          // Fall back to email check
-          const isAdminByEmail =
-            user.email &&
-            ADMIN_EMAILS.map((email) => email.toLowerCase()).includes(
-              user.email.toLowerCase()
-            );
-          setIsAdmin(isAdminByEmail);
-          return;
-        }
-
-        if (data) {
-          setIsAdmin(true);
-          return;
-        }
-
-        // If not in database, check legacy methods
-        const isAdminByEmail =
-          user.email &&
-          ADMIN_EMAILS.map((email) => email.toLowerCase()).includes(
-            user.email.toLowerCase()
-          );
-        const isAdminByMetadata =
-          user.app_metadata && user.app_metadata.role === "admin";
-
-        setIsAdmin(isAdminByEmail || isAdminByMetadata);
-      } catch (error) {
-        console.error("Error in admin check:", error);
-
-        // Fall back to email check
-        const isAdminByEmail =
-          user.email &&
-          ADMIN_EMAILS.map((email) => email.toLowerCase()).includes(
-            user.email.toLowerCase()
-          );
-        setIsAdmin(isAdminByEmail);
-      }
-    };
-
-    checkAdminStatus();
-  }, [user]);
 
   // Define navigation items - only show public pages for non-authenticated users
   const navItems = [
@@ -105,6 +50,10 @@ const Navigation = () => {
     setIsMenuOpen(false);
   };
 
+  const handleReturnToAdminView = () => {
+    setAdminView(false);
+  };
+
   const getUserInitials = () => {
     if (!user) return "U";
     if (user.user_metadata?.first_name) {
@@ -118,7 +67,7 @@ const Navigation = () => {
   };
 
   // Show admin badge in dropdown if viewing as regular user
-  const adminViewingAsUser = viewAsUser;
+  const adminViewingAsUser = viewAsUser && isAdmin;
 
   return (
     <nav className="bg-flytbase-primary border-b border-white/10 sticky top-0 z-50">
@@ -199,8 +148,8 @@ const Navigation = () => {
                     <Link to="/dashboard">Dashboard</Link>
                   </DropdownMenuItem>
                   {isAdmin && adminViewingAsUser && (
-                    <DropdownMenuItem asChild>
-                      <Link to="/admin">Return to Admin View</Link>
+                    <DropdownMenuItem onClick={handleReturnToAdminView}>
+                      Return to Admin View
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
@@ -293,14 +242,13 @@ const Navigation = () => {
                     </div>
                   </div>
                   {isAdmin && adminViewingAsUser && (
-                    <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start"
-                      >
-                        Return to Admin View
-                      </Button>
-                    </Link>
+                    <Button
+                      onClick={handleReturnToAdminView}
+                      variant="outline"
+                      className="w-full justify-start"
+                    >
+                      Return to Admin View
+                    </Button>
                   )}
                   <Button
                     onClick={handleSignOut}

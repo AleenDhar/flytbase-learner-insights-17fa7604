@@ -14,7 +14,8 @@ import {
   PlayCircle, 
   CheckCircle,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Youtube
 } from 'lucide-react';
 import { CourseProps } from '@/components/CourseCard';
 import { coursesData } from './Courses';
@@ -25,8 +26,56 @@ const CourseDetail = () => {
   const [activeModule, setActiveModule] = useState(0);
   const [expandedModules, setExpandedModules] = useState<number[]>([0]);
 
-  // Mock module data
-  const modulesData = [
+  // Updated module data for the FlytBase course with the YouTube playlist
+  const flytbaseModulesData = [
+    { 
+      title: "Introduction to FlytBase", 
+      duration: "10 mins",
+      description: "Get started with FlytBase drone automation platform",
+      videoId: "Eb6yAhXlwGY", // First video from the playlist
+      completed: false,
+      playlistId: "PLmINGqoqKHT1Y9hbHzzFUEpXHcbE4-nko",
+      lessons: [
+        { title: "FlytBase Introduction", duration: "10 mins", completed: false }
+      ]
+    },
+    { 
+      title: "FlytOS Installation", 
+      duration: "18 mins",
+      description: "Learn how to install FlytOS on your drone",
+      videoId: "ZEHG-jQYvfw", // Second video from the playlist
+      completed: false,
+      playlistId: "PLmINGqoqKHT1Y9hbHzzFUEpXHcbE4-nko",
+      lessons: [
+        { title: "FlytOS Installation Steps", duration: "18 mins", completed: false }
+      ]
+    },
+    { 
+      title: "Getting Started with FlytAPI", 
+      duration: "15 mins",
+      description: "Introduction to FlytAPI for drone automation",
+      videoId: "mHLtI2wWYqw", // Third video from the playlist
+      completed: false,
+      playlistId: "PLmINGqoqKHT1Y9hbHzzFUEpXHcbE4-nko",
+      lessons: [
+        { title: "FlytAPI Basics", duration: "15 mins", completed: false }
+      ]
+    },
+    { 
+      title: "FlytConsole Interface", 
+      duration: "11 mins",
+      description: "Navigate and use the FlytConsole web interface",
+      videoId: "eo8yZqP1dBU", // Fourth video from the playlist
+      completed: false,
+      playlistId: "PLmINGqoqKHT1Y9hbHzzFUEpXHcbE4-nko",
+      lessons: [
+        { title: "FlytConsole Interface Overview", duration: "11 mins", completed: false }
+      ]
+    }
+  ];
+
+  // Original module data for other courses
+  const defaultModulesData = [
     { 
       title: "Introduction to Drones", 
       duration: "45 mins",
@@ -66,10 +115,27 @@ const CourseDetail = () => {
     }
   ];
 
+  // Function to determine which module data to use based on the course
+  const getModuleDataForCourse = (course: CourseProps | null) => {
+    if (!course) return defaultModulesData;
+    
+    // Check if this is the FlytBase course
+    if (course.title.includes("FlytBase")) {
+      return flytbaseModulesData;
+    }
+    
+    return defaultModulesData;
+  };
+
+  const [modulesData, setModulesData] = useState(defaultModulesData);
+
   useEffect(() => {
     // In a real app, this would be an API call
     const foundCourse = coursesData.find(c => c.id === courseId) || null;
     setCourse(foundCourse);
+    
+    // Set the appropriate module data based on the course
+    setModulesData(getModuleDataForCourse(foundCourse));
   }, [courseId]);
 
   const toggleModuleExpand = (index: number) => {
@@ -122,6 +188,12 @@ const CourseDetail = () => {
                   <Award className="mr-2 h-5 w-5" />
                   <span>Certificate on Completion</span>
                 </div>
+                {modulesData[0].playlistId && (
+                  <div className="flex items-center text-neutral-300">
+                    <Youtube className="mr-2 h-5 w-5" />
+                    <span>YouTube Playlist</span>
+                  </div>
+                )}
               </div>
 
               <Button size="lg" className="bg-flytbase-accent-orange text-white hover:bg-flytbase-accent-orange/90">
@@ -218,14 +290,25 @@ const CourseDetail = () => {
               <div className="bg-white rounded-lg shadow-sm overflow-hidden">
                 {/* Video Player */}
                 <div className="aspect-video">
-                  <iframe 
-                    className="w-full h-full"
-                    src={`https://www.youtube.com/embed/${modulesData[activeModule].videoId}?rel=0`}
-                    title={modulesData[activeModule].title}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
+                  {modulesData[activeModule].playlistId ? (
+                    <iframe 
+                      className="w-full h-full"
+                      src={`https://www.youtube.com/embed/${modulesData[activeModule].videoId}?rel=0&list=${modulesData[activeModule].playlistId}`}
+                      title={modulesData[activeModule].title}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  ) : (
+                    <iframe 
+                      className="w-full h-full"
+                      src={`https://www.youtube.com/embed/${modulesData[activeModule].videoId}?rel=0`}
+                      title={modulesData[activeModule].title}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  )}
                 </div>
                 
                 {/* Module Information */}
@@ -241,6 +324,21 @@ const CourseDetail = () => {
                   <p className="text-neutral-600 mb-6">
                     {modulesData[activeModule].description}
                   </p>
+                  
+                  {/* YouTube Playlist link if available */}
+                  {modulesData[activeModule].playlistId && (
+                    <div className="mb-6">
+                      <a 
+                        href={`https://www.youtube.com/playlist?list=${modulesData[activeModule].playlistId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center text-flytbase-accent-orange hover:text-flytbase-accent-orange/90 transition-colors"
+                      >
+                        <Youtube className="mr-2 h-5 w-5" />
+                        View Full YouTube Playlist
+                      </a>
+                    </div>
+                  )}
                   
                   <Separator className="my-6" />
                   

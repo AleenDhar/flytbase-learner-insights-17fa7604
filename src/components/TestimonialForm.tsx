@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { useUser } from "@clerk/clerk-react";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,7 +40,7 @@ interface FormValues {
 }
 
 const TestimonialForm = ({ isOpen, onClose, courseId, courseName }: TestimonialFormProps) => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [rating, setRating] = useState(5);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -49,7 +49,9 @@ const TestimonialForm = ({ isOpen, onClose, courseId, courseName }: TestimonialF
 
   const form = useForm<FormValues>({
     defaultValues: {
-      name: user?.fullName || "",
+      name: user?.user_metadata?.first_name 
+        ? `${user.user_metadata.first_name} ${user.user_metadata.last_name || ''}`
+        : "",
       title: "",
       quote: "",
       rating: 5,

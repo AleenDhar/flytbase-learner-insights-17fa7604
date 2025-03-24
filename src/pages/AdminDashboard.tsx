@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useUser } from "@clerk/clerk-react";
+import { useAuth } from "@/context/AuthContext";
 import PerformanceDashboard from "@/components/PerformanceDashboard";
 import CoursePopularity from "@/components/CoursePopularity";
 import { Link } from "react-router-dom";
@@ -12,7 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { useAdminView } from "@/hooks/use-admin-view";
 
 const AdminDashboard = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const [timeRange, setTimeRange] = useState("month");
   const { toggleView } = useAdminView();
 
@@ -25,7 +25,7 @@ const AdminDashboard = () => {
           <div>
             <h1 className="text-3xl font-bold text-neutral-100">Admin Dashboard</h1>
             <p className="text-neutral-400 mt-1">
-              Welcome, {user?.firstName || "Admin"}! Manage your academy and view learner analytics.
+              Welcome, {user?.email?.split('@')[0] || "Admin"}! Manage your academy and view learner analytics.
             </p>
           </div>
           <div className="flex items-center gap-4">

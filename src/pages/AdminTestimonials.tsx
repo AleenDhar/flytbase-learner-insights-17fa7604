@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/drawer";
 import { Pencil, Plus, Star, Trash2, CheckCircle, X } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { useAuth } from "@/context/AuthContext";
 
 const INITIAL_FORM_DATA: TestimonialFormData = {
   name: "",
@@ -54,6 +55,7 @@ const AdminTestimonials = () => {
   const [testimonialToDelete, setTestimonialToDelete] = useState<Testimonial | null>(null);
   const isMobile = useMediaQuery("(max-width: 768px)");
   const { toast } = useToast();
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchTestimonials();

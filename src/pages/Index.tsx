@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import BrandLogo from '@/components/BrandLogo';
 import TestimonialSlider from '@/components/TestimonialSlider';
-import { BookOpen, Award, Layers, Users, ArrowRight, Clock } from 'lucide-react';
+import { BookOpen, Award, Layers, Users, ArrowRight, Clock, Building, FileText, GraduationCap } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import UserCourses from '@/components/UserCourses';
 
@@ -16,7 +16,7 @@ const Index = () => {
     <div className="min-h-screen bg-neutral-100">
       <Navigation />
       
-      {/* Hero Section */}
+      {/* Hero Section - Updated with new tagline */}
       <section className="relative bg-flytbase-primary text-white py-20 overflow-hidden">
         <div className="absolute inset-0 opacity-30">
           <div className="absolute inset-0 bg-[url('../lovable-uploads/21a681d0-8a71-4d3d-907a-38d6aeed53d4.png')] bg-cover bg-center bg-no-repeat"></div>
@@ -25,6 +25,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="md:flex md:items-center md:justify-between">
             <div className="md:w-3/5 animate-fade-in" style={{ '--delay': '0' } as React.CSSProperties}>
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">Your Journey to Drone Autonomy Starts Here</h1>
               <p className="text-xl mb-8 text-blue-100">Become a certified drone expert with our industry-leading courses and hands-on training</p>
               <div className="flex flex-wrap gap-4">
                 <Button size="lg" className="bg-white text-flytbase-primary hover:bg-blue-50" asChild>
@@ -49,6 +50,67 @@ const Index = () => {
                 />
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* New "Why FlytBase Academy?" Section */}
+      <section className="py-16 bg-[#0A0B0D] text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="md:flex md:items-start md:justify-between mb-12">
+            <div className="md:w-1/3 mb-8 md:mb-0">
+              <h2 className="text-3xl md:text-4xl font-bold">Why FlytBase Academy?</h2>
+            </div>
+            <div className="md:w-1/2">
+              <p className="text-lg text-neutral-300">
+                Enhance industry awareness, bridge skill gaps, and maximize the ROI of your autonomous drone program.
+              </p>
+              <Link to="/courses" className="inline-flex items-center mt-4 text-flytbase-secondary hover:text-flytbase-secondary/80 transition-colors">
+                See Courses
+                <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Flexible Learning Card */}
+            <Card className="bg-[#131517] border-neutral-800 shadow-xl hover-lift">
+              <CardContent className="p-8">
+                <div className="rounded-full bg-flytbase-primary/50 p-4 w-fit mb-6">
+                  <GraduationCap className="h-6 w-6 text-flytbase-secondary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-4">Flexible Learning</h3>
+                <p className="text-neutral-400">
+                  Master autonomous drone operations at your own pace with our remote and self-paced training programs.
+                </p>
+              </CardContent>
+            </Card>
+            
+            {/* Comprehensive Curriculum Card */}
+            <Card className="bg-[#131517] border-neutral-800 shadow-xl hover-lift">
+              <CardContent className="p-8">
+                <div className="rounded-full bg-flytbase-primary/50 p-4 w-fit mb-6">
+                  <FileText className="h-6 w-6 text-flytbase-secondary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-4">Comprehensive Curriculum</h3>
+                <p className="text-neutral-400">
+                  Explore autonomous drone technology through our tailor-made courses. Covering all industry aspects from foundation to advanced levels, we ensure learners at any stage gain comprehensive skills and insights.
+                </p>
+              </CardContent>
+            </Card>
+            
+            {/* Industry-Expert Led Card */}
+            <Card className="bg-[#131517] border-neutral-800 shadow-xl hover-lift">
+              <CardContent className="p-8">
+                <div className="rounded-full bg-flytbase-primary/50 p-4 w-fit mb-6">
+                  <Building className="h-6 w-6 text-flytbase-secondary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-4">Industry-Expert Led</h3>
+                <p className="text-neutral-400">
+                  Learn directly from industry leaders at the forefront of autonomous drone operations. Our courses are led by experts actively shaping enterprise solutions across diverse applications.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

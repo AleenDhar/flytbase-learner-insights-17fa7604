@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from '@/hooks/use-toast';
 import { 
   ArrowLeft, 
   BookOpen, 
@@ -90,6 +91,7 @@ const CourseDetail = () => {
   const [modulesData, setModulesData] = useState<ModuleData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasPlaylist, setHasPlaylist] = useState(false);
+  const [playlistId, setPlaylistId] = useState<string | undefined>(undefined);
 
   // Find the course data first
   useEffect(() => {
@@ -100,45 +102,62 @@ const CourseDetail = () => {
     // Check if course has a playlist
     if (foundCourse && foundCourse.youtubePlaylistId) {
       setHasPlaylist(true);
+      setPlaylistId(foundCourse.youtubePlaylistId);
     } else {
       setHasPlaylist(false);
       setModulesData(defaultModulesData);
       setIsLoading(false);
+      setPlaylistId(undefined);
     }
   }, [courseId]);
 
   // Only run the YouTube hook when we have a playlist ID
-  const { videos, loading, error } = useYouTubePlaylist(
-    hasPlaylist ? course?.youtubePlaylistId : undefined
-  );
+  const { videos, loading, error } = useYouTubePlaylist(playlistId);
 
   // Process videos into modules after they're loaded
   useEffect(() => {
     if (!hasPlaylist || !course) return;
 
     // Only proceed if we have videos and we're not still loading
-    if (!loading && videos.length > 0) {
-      console.log(`Processing ${videos.length} videos for course modules`);
-      
-      const playlistModules = videos.map((video: YouTubeVideo, index: number): ModuleData => ({
-        title: video.title,
-        duration: video.duration,
-        description: `Module ${index + 1} of the ${course.title} course`,
-        videoId: video.id,
-        completed: false,
-        playlistId: course.youtubePlaylistId,
-        lessons: [
-          { title: video.title, duration: video.duration, completed: false }
-        ]
-      }));
-      
-      setModulesData(playlistModules);
-      setIsLoading(false);
-    } else if (!loading && error) {
-      // If there was an error loading the playlist, fall back to default modules
-      console.error("Using default modules due to YouTube API error:", error);
-      setModulesData(defaultModulesData);
-      setIsLoading(false);
+    if (!loading) {
+      if (videos.length > 0) {
+        console.log(`Processing ${videos.length} videos for course modules`);
+        
+        const playlistModules = videos.map((video: YouTubeVideo, index: number): ModuleData => ({
+          title: video.title,
+          duration: video.duration,
+          description: `Module ${index + 1} of the ${course.title} course`,
+          videoId: video.id,
+          completed: false,
+          playlistId: course.youtubePlaylistId,
+          lessons: [
+            { title: video.title, duration: video.duration, completed: false }
+          ]
+        }));
+        
+        setModulesData(playlistModules);
+        setIsLoading(false);
+      } else if (error) {
+        // If there was an error loading the playlist, fall back to default modules
+        console.error("Using default modules due to YouTube API error:", error);
+        
+        // Only show a toast if it's not an API key error (already handled in the YouTube hook)
+        if (!error.includes('API key')) {
+          toast({
+            title: "Error Loading Content",
+            description: "Couldn't load course videos. Showing default content instead.",
+            variant: "destructive"
+          });
+        }
+        
+        setModulesData(defaultModulesData);
+        setIsLoading(false);
+      } else {
+        // No videos found but no error either (empty playlist)
+        console.log("No videos found in playlist, using default modules");
+        setModulesData(defaultModulesData);
+        setIsLoading(false);
+      }
     }
   }, [course, videos, loading, error, hasPlaylist]);
 
@@ -241,7 +260,7 @@ const CourseDetail = () => {
                   <div className="flex items-start">
                     <AlertCircle className="h-5 w-5 text-red-400 mr-2 flex-shrink-0 mt-0.5" />
                     <p className="text-sm text-red-300">
-                      Error loading course content: {error}
+                      Error loading course content: Using default modules
                     </p>
                   </div>
                 </div>

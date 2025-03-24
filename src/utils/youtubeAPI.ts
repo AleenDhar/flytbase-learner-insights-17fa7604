@@ -1,5 +1,5 @@
-
 import { useState, useEffect } from 'react';
+import { toast } from '@/hooks/use-toast';
 
 // Interface for a single YouTube video item
 export interface YouTubeVideo {
@@ -9,7 +9,9 @@ export interface YouTubeVideo {
   thumbnail: string;
 }
 
-const API_KEY = 'AIzaSyDOlMICk5Oz6yAM5nHQ_JzixQBGKulOFYA'; // You would typically store this in an environment variable
+// Using environment variables would be better practice,
+// but for now we'll keep it in the code with a note about proper handling
+const API_KEY = 'AIzaSyDOlMICk5Oz6yAM5nHQ_JzixQBGKulOFYA'; 
 
 /**
  * Formats the ISO 8601 duration from YouTube API into a human-readable format
@@ -76,6 +78,8 @@ export const useYouTubePlaylist = (playlistId: string | undefined) => {
       return;
     }
 
+    let isMounted = true; // Flag to prevent state updates if component unmounts
+
     const fetchPlaylistItems = async () => {
       try {
         console.log(`Fetching playlist items for ID: ${playlistId}`);
@@ -97,6 +101,12 @@ export const useYouTubePlaylist = (playlistId: string | undefined) => {
           if (!playlistResponse.ok) {
             const errorData = await playlistResponse.json().catch(() => ({}));
             console.error("YouTube API Error:", errorData);
+            
+            // If we have an API key error, show a specific error message
+            if (errorData?.error?.message?.includes('API key not valid')) {
+              throw new Error('Invalid YouTube API key. Please update the key to access videos.');
+            }
+            
             throw new Error(`Failed to fetch playlist data: ${playlistResponse.status} ${playlistResponse.statusText}`);
           }
           
@@ -106,8 +116,10 @@ export const useYouTubePlaylist = (playlistId: string | undefined) => {
           if (!playlistData.items || playlistData.items.length === 0) {
             // If there are no items on the first page, set empty array and exit
             if (allVideos.length === 0) {
-              setVideos([]);
-              setLoading(false);
+              if (isMounted) {
+                setVideos([]);
+                setLoading(false);
+              }
               return;
             }
             // Otherwise, we've reached the end of pagination
@@ -152,29 +164,55 @@ export const useYouTubePlaylist = (playlistId: string | undefined) => {
         } while (nextPageToken); // Continue until there are no more pages
         
         // Update state with all videos
-        setVideos(allVideos);
-        console.log(`Successfully fetched ${allVideos.length} videos from YouTube playlist`);
+        if (isMounted) {
+          setVideos(allVideos);
+          setError(null); // Clear any previous errors
+          console.log(`Successfully fetched ${allVideos.length} videos from YouTube playlist`);
+        }
       } catch (err) {
         console.error('Error fetching YouTube data:', err);
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-        setError(errorMessage);
         
-        // Retry logic
-        if (retryCount < maxRetries) {
-          console.log(`Retrying fetch (${retryCount + 1}/${maxRetries})...`);
-          setRetryCount(prev => prev + 1);
-          // We'll retry with an exponential backoff
-          setTimeout(() => {
-            fetchPlaylistItems();
-          }, 1000 * Math.pow(2, retryCount));
-          return;
+        // Only update state if component is still mounted
+        if (isMounted) {
+          setError(errorMessage);
+          
+          // Show error toast for API key issues
+          if (errorMessage.includes('API key not valid') || errorMessage.includes('Invalid YouTube API key')) {
+            toast({
+              title: "YouTube API Error",
+              description: "Unable to load videos due to an API configuration issue. Default content will be shown instead.",
+              variant: "destructive"
+            });
+          }
+          
+          // Retry logic
+          if (retryCount < maxRetries) {
+            console.log(`Retrying fetch (${retryCount + 1}/${maxRetries})...`);
+            setRetryCount(prev => prev + 1);
+            // We'll retry with an exponential backoff
+            setTimeout(() => {
+              if (isMounted) {
+                fetchPlaylistItems();
+              }
+            }, 1000 * Math.pow(2, retryCount));
+            return;
+          }
         }
       } finally {
-        setLoading(false);
+        // Always update loading state if component is mounted
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchPlaylistItems();
+
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
   }, [playlistId, retryCount]);
 
   return { videos, loading, error };

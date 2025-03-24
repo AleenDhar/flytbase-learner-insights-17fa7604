@@ -1,21 +1,20 @@
-
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import BrandLogo from './BrandLogo';
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Menu, X } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import BrandLogo from "./BrandLogo";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useAdminView } from '@/hooks/use-admin-view';
-import { ADMIN_EMAILS } from './AdminRoute';
-import { supabase } from '@/integrations/supabase/client';
+} from "@/components/ui/dropdown-menu";
+import { useAdminView } from "@/hooks/use-admin-view";
+import { ADMIN_EMAILS } from "./AdminRoute";
+import { supabase } from "@/integrations/supabase/client";
 
 const Navigation = () => {
   const location = useLocation();
@@ -37,55 +36,67 @@ const Navigation = () => {
 
       try {
         // Check database first for admin role
-        const { data, error } = await supabase.rpc('is_admin', { uid: user.id });
-        
+        const { data, error } = await supabase.rpc("is_admin", {
+          uid: user.id,
+        });
+
         if (error) {
           console.error("Error checking admin status:", error);
           // Fall back to email check
-          const isAdminByEmail = user.email && 
-                               ADMIN_EMAILS.map(email => email.toLowerCase()).includes(user.email.toLowerCase());
+          const isAdminByEmail =
+            user.email &&
+            ADMIN_EMAILS.map((email) => email.toLowerCase()).includes(
+              user.email.toLowerCase()
+            );
           setIsAdmin(isAdminByEmail);
           return;
         }
-        
+
         if (data) {
           setIsAdmin(true);
           return;
         }
-        
+
         // If not in database, check legacy methods
-        const isAdminByEmail = user.email && 
-                             ADMIN_EMAILS.map(email => email.toLowerCase()).includes(user.email.toLowerCase());
-        const isAdminByMetadata = user.app_metadata && user.app_metadata.role === 'admin';
-        
+        const isAdminByEmail =
+          user.email &&
+          ADMIN_EMAILS.map((email) => email.toLowerCase()).includes(
+            user.email.toLowerCase()
+          );
+        const isAdminByMetadata =
+          user.app_metadata && user.app_metadata.role === "admin";
+
         setIsAdmin(isAdminByEmail || isAdminByMetadata);
       } catch (error) {
         console.error("Error in admin check:", error);
-        
+
         // Fall back to email check
-        const isAdminByEmail = user.email && 
-                             ADMIN_EMAILS.map(email => email.toLowerCase()).includes(user.email.toLowerCase());
+        const isAdminByEmail =
+          user.email &&
+          ADMIN_EMAILS.map((email) => email.toLowerCase()).includes(
+            user.email.toLowerCase()
+          );
         setIsAdmin(isAdminByEmail);
       }
     };
-    
+
     checkAdminStatus();
   }, [user]);
 
   // Define navigation items - only show public pages for non-authenticated users
   const navItems = [
-    { name: 'Home', path: '/' },
-    { name: 'Courses', path: '/courses' },
-    { name: 'Assessments', path: '/assessments' },
+    { name: "Home", path: "/" },
+    { name: "Courses", path: "/courses" },
+    { name: "Assessments", path: "/assessments" },
   ];
 
   // Add dashboard link for signed-in users only
   if (user) {
-    navItems.push({ name: 'Dashboard', path: '/dashboard' });
-    
+    navItems.push({ name: "Dashboard", path: "/dashboard" });
+
     // Only add admin link if user is admin and not viewing as regular user
     if (isAdmin && !viewAsUser) {
-      navItems.push({ name: 'Admin', path: '/admin' });
+      navItems.push({ name: "Admin", path: "/admin" });
     }
   }
 
@@ -95,18 +106,22 @@ const Navigation = () => {
   };
 
   const getUserInitials = () => {
-    if (!user) return 'U';
+    if (!user) return "U";
     if (user.user_metadata?.first_name) {
-      return `${user.user_metadata.first_name.charAt(0)}${user.user_metadata.last_name ? user.user_metadata.last_name.charAt(0) : ''}`;
+      return `${user.user_metadata.first_name.charAt(0)}${
+        user.user_metadata.last_name
+          ? user.user_metadata.last_name.charAt(0)
+          : ""
+      }`;
     }
-    return user.email ? user.email.charAt(0).toUpperCase() : 'U';
+    return user.email ? user.email.charAt(0).toUpperCase() : "U";
   };
 
   // Show admin badge in dropdown if viewing as regular user
   const adminViewingAsUser = viewAsUser;
 
   return (
-    <nav className="bg-flytbase-primary border-b border-white/10 sticky top-0 z-10">
+    <nav className="bg-flytbase-primary border-b border-white/10 sticky top-0  z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
@@ -123,8 +138,8 @@ const Navigation = () => {
                     to={item.path}
                     className={`px-3 py-2 rounded-md text-sm font-medium ${
                       location.pathname === item.path
-                        ? 'text-white bg-[#1A1F2C]'
-                        : 'text-neutral-300 hover:text-white hover:bg-[#1A1F2C]/50'
+                        ? "text-white bg-[#1A1F2C]"
+                        : "text-neutral-300 hover:text-white hover:bg-[#1A1F2C]/50"
                     } transition-colors duration-200`}
                   >
                     {item.name}
@@ -137,16 +152,24 @@ const Navigation = () => {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                  <Button
+                    variant="ghost"
+                    className="relative h-9 w-9 rounded-full"
+                  >
                     <Avatar className="h-9 w-9">
-                      <AvatarImage src={user.user_metadata?.avatar_url || ''} alt={user.email || 'User'} />
+                      <AvatarImage
+                        src={user.user_metadata?.avatar_url || ""}
+                        alt={user.email || "User"}
+                      />
                       <AvatarFallback className="bg-flytbase-secondary text-white">
                         {getUserInitials()}
                       </AvatarFallback>
                     </Avatar>
                     {adminViewingAsUser && (
-                      <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-blue-600 border-2 border-flytbase-primary" 
-                           title="Admin viewing as user"></div>
+                      <div
+                        className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-blue-600 border-2 border-flytbase-primary"
+                        title="Admin viewing as user"
+                      ></div>
                     )}
                   </Button>
                 </DropdownMenuTrigger>
@@ -155,7 +178,8 @@ const Navigation = () => {
                     <div className="flex flex-col space-y-1 leading-none">
                       {user.user_metadata?.first_name && (
                         <p className="font-medium">
-                          {user.user_metadata.first_name} {user.user_metadata.last_name}
+                          {user.user_metadata.first_name}{" "}
+                          {user.user_metadata.last_name}
                         </p>
                       )}
                       {user.email && (
@@ -180,7 +204,10 @@ const Navigation = () => {
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut} className="text-red-500">
+                  <DropdownMenuItem
+                    onClick={handleSignOut}
+                    className="text-red-500"
+                  >
                     Log out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -199,7 +226,11 @@ const Navigation = () => {
               className="inline-flex items-center justify-center p-2 rounded-md text-neutral-300 hover:text-white hover:bg-[#1A1F2C]/50 transition-colors duration-200"
             >
               <span className="sr-only">Open main menu</span>
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </button>
           </div>
         </div>
@@ -216,8 +247,8 @@ const Navigation = () => {
                 onClick={() => setIsMenuOpen(false)}
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
                   location.pathname === item.path
-                    ? 'text-white bg-[#2A3249]'
-                    : 'text-neutral-300 hover:text-white hover:bg-[#2A3249]/50'
+                    ? "text-white bg-[#2A3249]"
+                    : "text-neutral-300 hover:text-white hover:bg-[#2A3249]/50"
                 } transition-colors duration-200`}
               >
                 {item.name}
@@ -231,7 +262,10 @@ const Navigation = () => {
                   <div className="flex items-center px-3 py-2">
                     <div className="mr-3 relative">
                       <Avatar className="h-9 w-9">
-                        <AvatarImage src={user.user_metadata?.avatar_url || ''} alt={user.email || 'User'} />
+                        <AvatarImage
+                          src={user.user_metadata?.avatar_url || ""}
+                          alt={user.email || "User"}
+                        />
                         <AvatarFallback className="bg-flytbase-secondary text-white">
                           {getUserInitials()}
                         </AvatarFallback>
@@ -242,9 +276,11 @@ const Navigation = () => {
                     </div>
                     <div>
                       <div className="text-base font-medium text-white">
-                        {user.user_metadata?.first_name 
-                          ? `${user.user_metadata.first_name} ${user.user_metadata.last_name || ''}`
-                          : user.email?.split('@')[0] || 'User'}
+                        {user.user_metadata?.first_name
+                          ? `${user.user_metadata.first_name} ${
+                              user.user_metadata.last_name || ""
+                            }`
+                          : user.email?.split("@")[0] || "User"}
                       </div>
                       <div className="text-sm text-neutral-400">
                         {user.email}
@@ -258,17 +294,17 @@ const Navigation = () => {
                   </div>
                   {isAdmin && adminViewingAsUser && (
                     <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         className="w-full justify-start"
                       >
                         Return to Admin View
                       </Button>
                     </Link>
                   )}
-                  <Button 
-                    onClick={handleSignOut} 
-                    variant="destructive" 
+                  <Button
+                    onClick={handleSignOut}
+                    variant="destructive"
                     className="w-full justify-start"
                   >
                     Sign Out

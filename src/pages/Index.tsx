@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import BrandLogo from '@/components/BrandLogo';
+import TestimonialSlider from '@/components/TestimonialSlider';
 import { BookOpen, Award, Layers, Users, ArrowRight } from 'lucide-react';
 
 const Index = () => {
@@ -161,54 +162,14 @@ const Index = () => {
         </div>
       </section>
       
-      {/* Testimonial Section */}
+      {/* Testimonial Section - Updated with dynamic testimonials */}
       <section className="py-16 bg-flytbase-primary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-white">What Our Students Say</h2>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                quote: "The hands-on projects helped me transition from a hobbyist to a professional drone operator in just a few months.",
-                name: "Alex Johnson",
-                title: "Commercial Drone Pilot"
-              },
-              {
-                quote: "FlytBase Academy's certification gave me the credibility I needed to start my own aerial photography business.",
-                name: "Sarah Chen",
-                title: "Aerial Photographer"
-              },
-              {
-                quote: "The instructor support is exceptional. They're always available to answer questions and provide feedback.",
-                name: "Michael Rodriguez",
-                title: "Drone Mapping Specialist"
-              }
-            ].map((testimonial, index) => (
-              <Card 
-                key={index} 
-                className="border-none bg-[#1A1F2C] shadow-card hover-lift animate-fade-in"
-                style={{ '--delay': index * 0.1 + 4 } as React.CSSProperties}
-              >
-                <CardContent className="p-6">
-                  <div className="mb-4 text-flytbase-secondary">
-                    {"★".repeat(5)}
-                  </div>
-                  <p className="text-lg italic mb-6 text-neutral-300">"{testimonial.quote}"</p>
-                  <div className="flex items-center">
-                    <div className="h-12 w-12 rounded-full bg-flytbase-secondary/20 flex items-center justify-center text-flytbase-secondary font-bold text-xl">
-                      {testimonial.name.charAt(0)}
-                    </div>
-                    <div className="ml-4">
-                      <p className="font-semibold text-white">{testimonial.name}</p>
-                      <p className="text-sm text-neutral-400">{testimonial.title}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <TestimonialSlider />
         </div>
       </section>
       

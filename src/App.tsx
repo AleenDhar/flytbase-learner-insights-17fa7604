@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminTestimonials from "./pages/AdminTestimonials";
 import LoadingScreen from "./components/LoadingScreen";
 import { useAuth } from "./context/AuthContext";
 
@@ -75,6 +76,15 @@ const App = () => {
               element={
                 <AdminRoute>
                   <AdminDashboard />
+                </AdminRoute>
+              } 
+            />
+            
+            <Route 
+              path="/admin/testimonials" 
+              element={
+                <AdminRoute>
+                  <AdminTestimonials />
                 </AdminRoute>
               } 
             />

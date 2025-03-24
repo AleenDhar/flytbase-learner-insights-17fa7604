@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from '@/hooks/use-toast';
 
@@ -9,9 +10,8 @@ export interface YouTubeVideo {
   thumbnail: string;
 }
 
-// Using environment variables would be better practice,
-// but for now we'll keep it in the code with a note about proper handling
-const API_KEY = 'AIzaSyDOlMICk5Oz6yAM5nHQ_JzixQBGKulOFYA'; 
+// Updated API key with the one provided by the user
+const API_KEY = 'AIzaSyBnypq4XxELQJprMvw4nYbNx_odCybJSks'; 
 
 /**
  * Formats the ISO 8601 duration from YouTube API into a human-readable format

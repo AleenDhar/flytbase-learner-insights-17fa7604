@@ -1,7 +1,6 @@
 
 import React, { useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Download } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -36,7 +35,7 @@ const Certificate = ({
           scale: 2,
           logging: false,
           useCORS: true,
-          backgroundColor: '#1A1F2C'
+          backgroundColor: '#FFFFFF'
         });
 
         // Calculate dimensions to maintain A4 proportions
@@ -81,46 +80,84 @@ const Certificate = ({
           </Button>
         </div>
         
-        <div ref={certificateRef} className="bg-[#1A1F2C] p-8 border-8 border-flytbase-secondary/20 rounded-lg">
+        <div ref={certificateRef} className="bg-white p-8 border-2 border-blue-600 rounded-lg">
           <div className="text-center mb-6">
-            <div className="mb-2">
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-1">FLYTBASE ACADEMY</h2>
-              <p className="text-neutral-400">Certificate of Achievement</p>
-            </div>
-            
-            <div className="w-36 h-1 bg-flytbase-secondary mx-auto my-4"></div>
-            
-            <p className="text-neutral-300 italic">This is to certify that</p>
-            <h1 className="text-3xl md:text-4xl font-bold text-flytbase-secondary my-2">{fullName}</h1>
-            <p className="text-neutral-300 mb-4">{designation}</p>
-            
-            <p className="text-white mb-6">
-              has successfully completed the assessment
-              <span className="block text-xl md:text-2xl font-semibold text-flytbase-secondary mt-2">
-                {assessmentTitle}
-              </span>
-              with a score of <span className="font-bold">{score}%</span>
-            </p>
-            
-            <div className="flex justify-between items-center mt-12 mb-8">
-              <div className="text-center">
-                <div className="w-32 h-px bg-white/20 mx-auto mb-2"></div>
-                <p className="text-neutral-400 text-sm">Date</p>
-                <p className="text-white">{formattedDate}</p>
-              </div>
-              
-              <div className="text-center">
+            {/* FlytBase Logo */}
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center">
                 <img 
-                  src="/lovable-uploads/481a13eb-6855-4500-888c-8c5d4a3734a1.png" 
+                  src="/lovable-uploads/beb4c3f0-62a3-4fed-a309-28749c117012.png" 
                   alt="FlytBase Logo" 
-                  className="h-16 mx-auto mb-2"
+                  className="h-10"
                 />
-                <div className="w-32 h-px bg-white/20 mx-auto mb-2"></div>
-                <p className="text-white">FlytBase Academy</p>
+              </div>
+              <div className="border border-blue-600 rounded">
+                <div className="flex flex-col items-center">
+                  <div className="bg-white p-1">
+                    <img 
+                      src="/lovable-uploads/beb4c3f0-62a3-4fed-a309-28749c117012.png" 
+                      alt="FlytBase Logo" 
+                      className="h-6"
+                    />
+                  </div>
+                  <div className="bg-blue-600 text-white text-sm font-bold py-1 px-4">
+                    CERTIFIED OPERATER
+                  </div>
+                </div>
               </div>
             </div>
             
-            <div className="mt-8 text-sm text-neutral-400 flex justify-between items-center border-t border-white/10 pt-4">
+            {/* Certificate Title */}
+            <h1 className="text-4xl md:text-5xl font-bold text-blue-600 mb-3 text-left">FlytBase Certificate</h1>
+            <div className="w-full h-1 bg-blue-200 mb-8"></div>
+            
+            {/* Certificate Content */}
+            <div className="text-left mb-8">
+              <p className="text-lg mb-5">
+                <span className="font-bold">{fullName}</span> of <span className="font-bold">{designation}</span> is a FlytBase Certified Operator.
+              </p>
+              
+              <p className="text-lg mb-6">He/She has successfully completed FlytBase training session to:</p>
+              
+              <ul className="space-y-3 text-left text-lg mb-8">
+                <li className="flex items-start">
+                  <div className="text-blue-600 mr-2 w-5 h-5 mt-1">✓</div>
+                  <span>Gain an understanding of how to operate FlytBase software</span>
+                </li>
+                <li className="flex items-start">
+                  <div className="text-blue-600 mr-2 w-5 h-5 mt-1">✓</div>
+                  <span>Manage a hybrid fleet of drones and docking stations</span>
+                </li>
+                <li className="flex items-start">
+                  <div className="text-blue-600 mr-2 w-5 h-5 mt-1">✓</div>
+                  <span>Plan and execute autonomous flights with FlytBase</span>
+                </li>
+                <li className="flex items-start">
+                  <div className="text-blue-600 mr-2 w-5 h-5 mt-1">✓</div>
+                  <span>Set requisite failsafes to ensure safe flights</span>
+                </li>
+                <li className="flex items-start">
+                  <div className="text-blue-600 mr-2 w-5 h-5 mt-1">✓</div>
+                  <span>Take manual remote control over FlytBase in unusual circumstances</span>
+                </li>
+                <li className="flex items-start">
+                  <div className="text-blue-600 mr-2 w-5 h-5 mt-1">✓</div>
+                  <span>Execute basic maintenance tasks</span>
+                </li>
+              </ul>
+              
+              <p className="text-lg mb-6">This certificate was granted on {formattedDate} by</p>
+              
+              <div className="flex justify-between items-end">
+                <div></div>
+                <div className="bg-gray-100 px-4 py-2 rounded">
+                  <p className="text-base">Director of Products - Dhiraj Dhule</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Certificate Footer */}
+            <div className="mt-8 text-sm text-gray-500 flex justify-between items-center pt-4">
               <span>Certificate ID: {certificateId}</span>
               <span>Verified by FlytBase Academy</span>
             </div>

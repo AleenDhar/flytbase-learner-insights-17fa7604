@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import BrandLogo from '@/components/BrandLogo';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader } from '@/components/ui/card';
+import { ADMIN_EMAILS } from '@/components/AdminRoute';
 
 const SignIn = () => {
   const { user, isLoading } = useAuth();
@@ -19,6 +19,19 @@ const SignIn = () => {
   
   // Redirect to dashboard if already signed in
   if (!isLoading && user) {
+    // Check if user is admin to redirect them appropriately
+    const isAdmin = user.email && ADMIN_EMAILS.includes(user.email) || 
+                   (user.app_metadata && user.app_metadata.role === 'admin');
+    
+    // Get admin view preference
+    const viewAsUser = localStorage.getItem("admin-view-as-user") === "true";
+    
+    // If user is admin and not viewing as user, go to admin dashboard
+    if (isAdmin && !viewAsUser) {
+      return <Navigate to="/admin" replace />;
+    }
+    
+    // Otherwise go to regular dashboard
     return <Navigate to="/dashboard" replace />;
   }
   
@@ -35,14 +48,25 @@ const SignIn = () => {
 
     try {
       setIsSubmitting(true);
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
       
-      navigate('/dashboard');
+      // Check if user is admin to redirect appropriately
+      const isAdmin = data.user?.email && ADMIN_EMAILS.includes(data.user.email) || 
+                    (data.user?.app_metadata && data.user.app_metadata.role === 'admin');
+      
+      // Get admin view preference
+      const viewAsUser = localStorage.getItem("admin-view-as-user") === "true";
+      
+      if (isAdmin && !viewAsUser) {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (error: any) {
       toast({
         title: "Sign in failed",

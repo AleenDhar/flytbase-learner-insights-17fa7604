@@ -70,7 +70,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     return <Navigate to="/sign-in" replace />;
   }
 
-  // Check if user has admin role and if they want to view as admin
+  // Check if user has admin role 
   if (!isAdmin) {
     console.log("Redirecting to dashboard - user not an admin");
     return <Navigate to="/dashboard" replace />;

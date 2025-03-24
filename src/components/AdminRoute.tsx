@@ -19,6 +19,11 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
   const { user, isLoading } = useAuth();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [checkingAdmin, setCheckingAdmin] = useState(true);
+  const [viewAsUser, setViewAsUser] = useState(() => {
+    // Get saved preference from localStorage
+    const saved = localStorage.getItem("admin-view-as-user");
+    return saved === "true";
+  });
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -58,6 +63,18 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     }
   }, [user]);
 
+  // Save view preference to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("admin-view-as-user", viewAsUser ? "true" : "false");
+  }, [viewAsUser]);
+
+  // Export the toggle function using a context
+  if (isAdmin && !viewAsUser === false) {
+    window.sessionStorage.setItem("adminViewingAsUser", "true");
+  } else {
+    window.sessionStorage.removeItem("adminViewingAsUser");
+  }
+
   if (isLoading || checkingAdmin) {
     return <div className="min-h-screen bg-flytbase-primary flex items-center justify-center">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-flytbase-secondary"></div>
@@ -70,9 +87,9 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     return <Navigate to="/sign-in" replace />;
   }
 
-  // Check if user has admin role
-  if (!isAdmin) {
-    console.log("Redirecting to dashboard - user not an admin");
+  // Check if user has admin role and if they want to view as admin
+  if (!isAdmin || viewAsUser) {
+    console.log("Redirecting to dashboard - user not an admin or viewing as regular user");
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -80,4 +97,4 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
   return <>{children}</>;
 };
 
-export default AdminRoute;
+export { AdminRoute as default, ADMIN_EMAILS };

@@ -7,11 +7,14 @@ import { useUser } from "@clerk/clerk-react";
 import PerformanceDashboard from "@/components/PerformanceDashboard";
 import CoursePopularity from "@/components/CoursePopularity";
 import { Link } from "react-router-dom";
-import { ArrowUpRight, TrendingUp, UserCheck, Clipboard, CalendarClock, MessageSquare } from "lucide-react";
+import { ArrowUpRight, TrendingUp, UserCheck, Clipboard, CalendarClock, MessageSquare, UserCog } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { useAdminView } from "@/hooks/use-admin-view";
 
 const AdminDashboard = () => {
   const { user } = useUser();
   const [timeRange, setTimeRange] = useState("month");
+  const { toggleView } = useAdminView();
 
   return (
     <div className="min-h-screen bg-flytbase-primary">
@@ -25,25 +28,38 @@ const AdminDashboard = () => {
               Welcome, {user?.firstName || "Admin"}! Manage your academy and view learner analytics.
             </p>
           </div>
-          <div className="flex items-center space-x-2 bg-[#1A1F2C] rounded-md p-1 border border-white/5">
-            <button 
-              onClick={() => setTimeRange("week")}
-              className={`px-3 py-1.5 rounded text-sm ${timeRange === "week" ? "bg-flytbase-secondary text-white" : "text-neutral-400"}`}
-            >
-              Week
-            </button>
-            <button 
-              onClick={() => setTimeRange("month")}
-              className={`px-3 py-1.5 rounded text-sm ${timeRange === "month" ? "bg-flytbase-secondary text-white" : "text-neutral-400"}`}
-            >
-              Month
-            </button>
-            <button 
-              onClick={() => setTimeRange("year")}
-              className={`px-3 py-1.5 rounded text-sm ${timeRange === "year" ? "bg-flytbase-secondary text-white" : "text-neutral-400"}`}
-            >
-              Year
-            </button>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center space-x-2 bg-[#1A1F2C] rounded-md p-1 border border-white/5">
+              <button 
+                onClick={() => setTimeRange("week")}
+                className={`px-3 py-1.5 rounded text-sm ${timeRange === "week" ? "bg-flytbase-secondary text-white" : "text-neutral-400"}`}
+              >
+                Week
+              </button>
+              <button 
+                onClick={() => setTimeRange("month")}
+                className={`px-3 py-1.5 rounded text-sm ${timeRange === "month" ? "bg-flytbase-secondary text-white" : "text-neutral-400"}`}
+              >
+                Month
+              </button>
+              <button 
+                onClick={() => setTimeRange("year")}
+                className={`px-3 py-1.5 rounded text-sm ${timeRange === "year" ? "bg-flytbase-secondary text-white" : "text-neutral-400"}`}
+              >
+                Year
+              </button>
+            </div>
+
+            {/* Admin/User View Toggle */}
+            <div className="flex items-center gap-2 bg-[#1A1F2C] rounded-md p-2 border border-white/5">
+              <UserCog className="h-4 w-4 text-neutral-400" />
+              <span className="text-sm text-neutral-400 mr-1">Admin View</span>
+              <Switch 
+                onCheckedChange={toggleView} 
+                id="user-view-toggle"
+              />
+              <span className="text-sm text-neutral-400">User View</span>
+            </div>
           </div>
         </div>
         

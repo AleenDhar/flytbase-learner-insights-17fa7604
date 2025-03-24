@@ -12,12 +12,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useAdminView } from '@/hooks/use-admin-view';
+import { ADMIN_EMAILS } from './AdminRoute';
 
 const Navigation = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
+  const { isAdminViewingAsUser } = useAdminView();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -26,8 +29,7 @@ const Navigation = () => {
   useEffect(() => {
     if (user?.email) {
       // Check if user is admin
-      const adminEmails = ["admin@flytbase.com", "admin2@flytbase.com"];
-      const isUserAdmin = adminEmails.includes(user.email) || 
+      const isUserAdmin = ADMIN_EMAILS.includes(user.email) || 
                          (user.app_metadata && user.app_metadata.role === 'admin');
       setIsAdmin(isUserAdmin);
     } else {
@@ -46,8 +48,8 @@ const Navigation = () => {
   if (user) {
     navItems.push({ name: 'Dashboard', path: '/dashboard' });
     
-    // Add admin dashboard link for admin users
-    if (isAdmin) {
+    // Only add admin link if user is admin and not viewing as regular user
+    if (isAdmin && !isAdminViewingAsUser()) {
       navItems.push({ name: 'Admin', path: '/admin' });
     }
   }
@@ -64,6 +66,9 @@ const Navigation = () => {
     }
     return user.email ? user.email.charAt(0).toUpperCase() : 'U';
   };
+
+  // Show admin badge in dropdown if viewing as regular user
+  const adminViewingAsUser = isAdminViewingAsUser();
 
   return (
     <nav className="bg-flytbase-primary border-b border-white/10 sticky top-0 z-10">
@@ -104,6 +109,10 @@ const Navigation = () => {
                         {getUserInitials()}
                       </AvatarFallback>
                     </Avatar>
+                    {adminViewingAsUser && (
+                      <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-blue-600 border-2 border-flytbase-primary" 
+                           title="Admin viewing as user"></div>
+                    )}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end">
@@ -119,12 +128,22 @@ const Navigation = () => {
                           {user.email}
                         </p>
                       )}
+                      {adminViewingAsUser && (
+                        <p className="text-sm text-blue-500 font-medium">
+                          Admin viewing as user
+                        </p>
+                      )}
                     </div>
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link to="/dashboard">Dashboard</Link>
                   </DropdownMenuItem>
+                  {isAdmin && adminViewingAsUser && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin">Return to Admin View</Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut} className="text-red-500">
                     Log out
@@ -175,13 +194,16 @@ const Navigation = () => {
               {user ? (
                 <>
                   <div className="flex items-center px-3 py-2">
-                    <div className="mr-3">
+                    <div className="mr-3 relative">
                       <Avatar className="h-9 w-9">
                         <AvatarImage src={user.user_metadata?.avatar_url || ''} alt={user.email || 'User'} />
                         <AvatarFallback className="bg-flytbase-secondary text-white">
                           {getUserInitials()}
                         </AvatarFallback>
                       </Avatar>
+                      {adminViewingAsUser && (
+                        <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-blue-600 border-2 border-flytbase-primary"></div>
+                      )}
                     </div>
                     <div>
                       <div className="text-base font-medium text-white">
@@ -192,8 +214,23 @@ const Navigation = () => {
                       <div className="text-sm text-neutral-400">
                         {user.email}
                       </div>
+                      {adminViewingAsUser && (
+                        <div className="text-sm text-blue-500">
+                          Admin viewing as user
+                        </div>
+                      )}
                     </div>
                   </div>
+                  {isAdmin && adminViewingAsUser && (
+                    <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
+                      <Button 
+                        variant="outline" 
+                        className="w-full justify-start"
+                      >
+                        Return to Admin View
+                      </Button>
+                    </Link>
+                  )}
                   <Button 
                     onClick={handleSignOut} 
                     variant="destructive" 

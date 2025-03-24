@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
 import WatchlistButton from '@/components/WatchlistButton';
+import CourseContentSection from '@/components/CourseContentSection';
 import { 
   ArrowLeft, 
   BookOpen, 
@@ -90,6 +91,8 @@ const CourseDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasPlaylist, setHasPlaylist] = useState(false);
   const [playlistId, setPlaylistId] = useState<string | undefined>(undefined);
+  const [showContent, setShowContent] = useState(false);
+  const [moduleCompleted, setModuleCompleted] = useState(false);
 
   useEffect(() => {
     const foundCourse = coursesData.find(c => c.id === courseId) || null;
@@ -157,6 +160,16 @@ const CourseDetail = () => {
         ? prev.filter(i => i !== index) 
         : [...prev, index]
     );
+  };
+
+  const handleQuizComplete = () => {
+    setModuleCompleted(true);
+    
+    if (activeModule < modulesData.length - 1) {
+      const updatedModules = [...modulesData];
+      updatedModules[activeModule].completed = true;
+      setModulesData(updatedModules);
+    }
   };
 
   if (!course) {
@@ -261,6 +274,7 @@ const CourseDetail = () => {
                         }`}
                         onClick={() => {
                           setActiveModule(index);
+                          setShowContent(false);
                           if (!expandedModules.includes(index)) {
                             toggleModuleExpand(index);
                           }
@@ -314,7 +328,7 @@ const CourseDetail = () => {
             </div>
             
             <div className="md:col-span-2">
-              <div className="bg-[#131A27] rounded-lg shadow-sm overflow-hidden border border-white/5">
+              <div className="bg-[#131A27] rounded-lg shadow-sm overflow-hidden border border-white/5 mb-6">
                 {loading || isLoading ? (
                   <div className="aspect-video bg-[#0F1623]">
                     <div className="flex items-center justify-center h-full">
@@ -370,24 +384,52 @@ const CourseDetail = () => {
                         {modulesData[activeModule].description}
                       </p>
                       
+                      <Button
+                        onClick={() => setShowContent(true)}
+                        className="mb-6 bg-flytbase-secondary hover:bg-flytbase-secondary/90 w-full"
+                      >
+                        Show Content & Knowledge Check
+                      </Button>
+                      
+                      {showContent && (
+                        <CourseContentSection 
+                          videoId={modulesData[activeModule].videoId}
+                          courseId={courseId || ""}
+                          onQuizComplete={handleQuizComplete}
+                        />
+                      )}
+                      
                       <Separator className="my-6 bg-white/10" />
                       
                       <div className="flex justify-between items-center">
                         <Button
                           variant="outline"
                           disabled={activeModule === 0}
-                          onClick={() => activeModule > 0 && setActiveModule(activeModule - 1)}
+                          onClick={() => {
+                            if (activeModule > 0) {
+                              setActiveModule(activeModule - 1);
+                              setShowContent(false);
+                            }
+                          }}
                           className="border-white/10 text-white hover:bg-white/5 hover:text-white"
                         >
                           Previous Module
                         </Button>
                         
                         <Button
-                          disabled={activeModule === modulesData.length - 1}
-                          onClick={() => activeModule < modulesData.length - 1 && setActiveModule(activeModule + 1)}
+                          disabled={activeModule === modulesData.length - 1 || (!moduleCompleted && !modulesData[activeModule].completed)}
+                          onClick={() => {
+                            if (activeModule < modulesData.length - 1) {
+                              setActiveModule(activeModule + 1);
+                              setShowContent(false);
+                              setModuleCompleted(false);
+                            }
+                          }}
                           className="bg-flytbase-secondary hover:bg-flytbase-secondary/90"
                         >
-                          Next Module
+                          {(!moduleCompleted && !modulesData[activeModule].completed) 
+                            ? "Complete Quiz to Continue" 
+                            : "Next Module"}
                         </Button>
                       </div>
                     </>

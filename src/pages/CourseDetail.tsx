@@ -20,6 +20,23 @@ import {
 import { CourseProps } from '@/components/CourseCard';
 import { coursesData } from './Courses';
 
+// Define interfaces for module and lesson data
+interface LessonData {
+  title: string;
+  duration: string;
+  completed: boolean;
+}
+
+interface ModuleData {
+  title: string;
+  duration: string;
+  description: string;
+  videoId: string;
+  completed: boolean;
+  lessons: LessonData[];
+  playlistId?: string; // Make playlistId optional to accommodate both module types
+}
+
 const CourseDetail = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const [course, setCourse] = useState<CourseProps | null>(null);
@@ -27,7 +44,7 @@ const CourseDetail = () => {
   const [expandedModules, setExpandedModules] = useState<number[]>([0]);
 
   // Updated module data for the FlytBase course with the YouTube playlist
-  const flytbaseModulesData = [
+  const flytbaseModulesData: ModuleData[] = [
     { 
       title: "Introduction to FlytBase", 
       duration: "10 mins",
@@ -75,7 +92,7 @@ const CourseDetail = () => {
   ];
 
   // Original module data for other courses
-  const defaultModulesData = [
+  const defaultModulesData: ModuleData[] = [
     { 
       title: "Introduction to Drones", 
       duration: "45 mins",
@@ -127,7 +144,7 @@ const CourseDetail = () => {
     return defaultModulesData;
   };
 
-  const [modulesData, setModulesData] = useState(defaultModulesData);
+  const [modulesData, setModulesData] = useState<ModuleData[]>(defaultModulesData);
 
   useEffect(() => {
     // In a real app, this would be an API call
@@ -188,7 +205,7 @@ const CourseDetail = () => {
                   <Award className="mr-2 h-5 w-5" />
                   <span>Certificate on Completion</span>
                 </div>
-                {modulesData[0].playlistId && (
+                {modulesData[0]?.playlistId && (
                   <div className="flex items-center text-neutral-300">
                     <Youtube className="mr-2 h-5 w-5" />
                     <span>YouTube Playlist</span>
@@ -290,7 +307,7 @@ const CourseDetail = () => {
               <div className="bg-white rounded-lg shadow-sm overflow-hidden">
                 {/* Video Player */}
                 <div className="aspect-video">
-                  {modulesData[activeModule].playlistId ? (
+                  {modulesData[activeModule]?.playlistId ? (
                     <iframe 
                       className="w-full h-full"
                       src={`https://www.youtube.com/embed/${modulesData[activeModule].videoId}?rel=0&list=${modulesData[activeModule].playlistId}`}
@@ -326,7 +343,7 @@ const CourseDetail = () => {
                   </p>
                   
                   {/* YouTube Playlist link if available */}
-                  {modulesData[activeModule].playlistId && (
+                  {modulesData[activeModule]?.playlistId && (
                     <div className="mb-6">
                       <a 
                         href={`https://www.youtube.com/playlist?list=${modulesData[activeModule].playlistId}`}
@@ -370,3 +387,4 @@ const CourseDetail = () => {
 };
 
 export default CourseDetail;
+

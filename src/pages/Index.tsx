@@ -17,10 +17,14 @@ const Index = () => {
     <div className="min-h-screen bg-neutral-100">
       <Navigation />
       
-      {/* Hero Section - Updated with new background image */}
+      {/* Hero Section - Fixed background image */}
       <section className="relative bg-flytbase-primary text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute inset-0 bg-[url('../lovable-uploads/c9cca1b7-22a0-4793-9b9b-aec57fef1c70.png')] bg-cover bg-center bg-no-repeat"></div>
+        <div className="absolute inset-0">
+          <img 
+            src="/lovable-uploads/c9cca1b7-22a0-4793-9b9b-aec57fef1c70.png" 
+            alt="Drone background" 
+            className="w-full h-full object-cover opacity-30"
+          />
           <div className="absolute inset-0 bg-gradient-to-r from-flytbase-primary via-flytbase-primary/80 to-transparent"></div>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

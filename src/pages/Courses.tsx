@@ -11,6 +11,16 @@ import { Link } from 'react-router-dom';
 // Mock data for courses
 export const coursesData: CourseProps[] = [
   {
+    id: "getting-started-flytbase",
+    title: "Getting Started with FlytBase",
+    description: "A comprehensive guide to using FlytBase for drone automation. Learn about FlytOS installation, FlytAPI, FlytConsole, and more.",
+    level: "Beginner",
+    duration: "2 weeks",
+    modules: 4,
+    thumbnail: "https://images.unsplash.com/photo-1473968512647-3e447244af8f",
+    youtubePlaylistId: "PLmINGqoqKHT1Y9hbHzzFUEpXHcbE4-nko"
+  },
+  {
     id: "drone-basics",
     title: "Drone Piloting Fundamentals",
     description: "Learn the basics of drone piloting, from takeoff and landing to advanced maneuvers. This course covers all essential skills for beginners.",

@@ -6,7 +6,7 @@ import { ArrowRight } from 'lucide-react';
 
 const HeroSection = () => {
   return (
-    <section className="relative bg-flytbase-primary text-white py-20 overflow-hidden">
+    <section className="relative bg-flytbase-primary text-white py-20 overflow-hidden z-10">
       <div className="absolute inset-0 z-0">
         <img 
           src="/lovable-uploads/c9cca1b7-22a0-4793-9b9b-aec57fef1c70.png" 

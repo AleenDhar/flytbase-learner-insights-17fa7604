@@ -13,23 +13,25 @@ const Index = () => {
   const { user } = useAuth();
   
   return (
-    <div className="min-h-screen bg-neutral-100">
+    <div className="min-h-screen bg-neutral-100 relative">
       <Navigation />
       
-      {/* Hero Section */}
-      <HeroSection />
-      
-      {/* Continue Learning Section (for signed-in users) */}
-      {user && <ContinueLearningSection />}
-      
-      {/* Course Categories */}
-      <CourseCategories />
-      
-      {/* Testimonial Section */}
-      <TestimonialSection />
-      
-      {/* CTA Section */}
-      <CTASection />
+      <main className="relative">
+        {/* Hero Section */}
+        <HeroSection />
+        
+        {/* Continue Learning Section (for signed-in users) */}
+        {user && <ContinueLearningSection />}
+        
+        {/* Course Categories */}
+        <CourseCategories />
+        
+        {/* Testimonial Section */}
+        <TestimonialSection />
+        
+        {/* CTA Section */}
+        <CTASection />
+      </main>
       
       {/* Footer */}
       <PageFooter />

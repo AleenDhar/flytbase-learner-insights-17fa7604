@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { Star } from "lucide-react";
+import { Star, User } from "lucide-react";
 
 const TestimonialSlider = () => {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
@@ -62,6 +62,14 @@ const TestimonialSlider = () => {
     };
   }, []);
 
+  const getProfileImageUrl = (path: string | null | undefined) => {
+    if (!path) return null;
+    
+    return supabase.storage
+      .from('testimonials')
+      .getPublicUrl(path).data.publicUrl;
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-8">
@@ -88,9 +96,19 @@ const TestimonialSlider = () => {
                 </div>
                 <p className="text-lg italic mb-6 text-neutral-300 flex-grow">"{testimonial.quote}"</p>
                 <div className="flex items-center mt-auto">
-                  <div className="h-12 w-12 rounded-full bg-flytbase-secondary/20 flex items-center justify-center text-flytbase-secondary font-bold text-xl">
-                    {testimonial.name.charAt(0)}
-                  </div>
+                  {testimonial.profile_image ? (
+                    <div className="h-12 w-12 rounded-full overflow-hidden bg-flytbase-secondary/20">
+                      <img 
+                        src={getProfileImageUrl(testimonial.profile_image)} 
+                        alt={testimonial.name}
+                        className="h-full w-full object-cover" 
+                      />
+                    </div>
+                  ) : (
+                    <div className="h-12 w-12 rounded-full bg-flytbase-secondary/20 flex items-center justify-center text-flytbase-secondary font-bold text-xl">
+                      {testimonial.name.charAt(0)}
+                    </div>
+                  )}
                   <div className="ml-4">
                     <p className="font-semibold text-white">{testimonial.name}</p>
                     <p className="text-sm text-neutral-400">{testimonial.title}</p>

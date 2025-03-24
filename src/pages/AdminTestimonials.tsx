@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,7 +34,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Pencil, Plus, Star, Trash2, CheckCircle, X } from "lucide-react";
-import { useMediaQuery } from "@/hooks/use-mobile";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 const INITIAL_FORM_DATA: TestimonialFormData = {
   name: "",

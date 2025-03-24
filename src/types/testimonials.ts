@@ -8,6 +8,8 @@ export interface Testimonial {
   is_published: boolean;
   created_at: string;
   updated_at: string;
+  profile_image?: string | null;
+  course_id?: string | null;
 }
 
 export interface TestimonialFormData {
@@ -16,4 +18,6 @@ export interface TestimonialFormData {
   quote: string;
   rating: number;
   is_published: boolean;
+  profile_image?: string | null;
+  course_id?: string | null;
 }

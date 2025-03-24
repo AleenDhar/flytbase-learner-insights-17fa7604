@@ -18,7 +18,8 @@ import {
   ChevronUp,
   Youtube,
   Info,
-  AlertCircle
+  AlertCircle,
+  Video
 } from 'lucide-react';
 import { CourseProps } from '@/components/CourseCard';
 import { coursesData } from './Courses';
@@ -40,6 +41,47 @@ interface ModuleData {
   playlistId?: string;
 }
 
+// Default modules data to use when no playlist is available
+const defaultModulesData: ModuleData[] = [
+  { 
+    title: "Introduction to Drones", 
+    duration: "45 mins",
+    description: "Overview of drone technology and applications",
+    videoId: "O-b1_T_1xGs",
+    completed: true,
+    lessons: [
+      { title: "What are Drones?", duration: "10 mins", completed: true },
+      { title: "History of Drone Technology", duration: "15 mins", completed: true },
+      { title: "Types of Drones", duration: "20 mins", completed: true }
+    ]
+  },
+  { 
+    title: "Basic Flight Controls", 
+    duration: "1 hour",
+    description: "Learn the fundamental controls for piloting a drone",
+    videoId: "U1Z-iqLVHnk",
+    completed: false,
+    lessons: [
+      { title: "Pre-Flight Checklist", duration: "12 mins", completed: false },
+      { title: "Takeoff and Landing", duration: "18 mins", completed: false },
+      { title: "Basic Maneuvers", duration: "15 mins", completed: false },
+      { title: "Emergency Procedures", duration: "15 mins", completed: false }
+    ]
+  },
+  { 
+    title: "Understanding Flight Dynamics", 
+    duration: "1.5 hours",
+    description: "Learn about drone physics and how they affect flight",
+    videoId: "E9j8GtuQUHk",
+    completed: false,
+    lessons: [
+      { title: "Principles of Flight", duration: "20 mins", completed: false },
+      { title: "Weather Considerations", duration: "25 mins", completed: false },
+      { title: "Flight Planning", duration: "25 mins", completed: false }
+    ]
+  }
+];
+
 const CourseDetail = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const [course, setCourse] = useState<CourseProps | null>(null);
@@ -47,6 +89,7 @@ const CourseDetail = () => {
   const [expandedModules, setExpandedModules] = useState<number[]>([0]);
   const [modulesData, setModulesData] = useState<ModuleData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasPlaylist, setHasPlaylist] = useState(false);
 
   // Find the course data first
   useEffect(() => {
@@ -54,21 +97,27 @@ const CourseDetail = () => {
     setCourse(foundCourse);
     setIsLoading(true);
     
-    // If we have no course or no playlist, set default modules
-    if (!foundCourse || !foundCourse.youtubePlaylistId) {
+    // Check if course has a playlist
+    if (foundCourse && foundCourse.youtubePlaylistId) {
+      setHasPlaylist(true);
+    } else {
+      setHasPlaylist(false);
       setModulesData(defaultModulesData);
       setIsLoading(false);
     }
   }, [courseId]);
 
-  // Now the YouTube hook will only run after we have a course with a playlistId
-  const { videos, loading, error } = useYouTubePlaylist(course?.youtubePlaylistId);
+  // Only run the YouTube hook when we have a playlist ID
+  const { videos, loading, error } = useYouTubePlaylist(
+    hasPlaylist ? course?.youtubePlaylistId : undefined
+  );
 
   // Process videos into modules after they're loaded
   useEffect(() => {
-    if (!course) return;
+    if (!hasPlaylist || !course) return;
 
-    if (course.youtubePlaylistId && videos.length > 0) {
+    // Only proceed if we have videos and we're not still loading
+    if (!loading && videos.length > 0) {
       console.log(`Processing ${videos.length} videos for course modules`);
       
       const playlistModules = videos.map((video: YouTubeVideo, index: number): ModuleData => ({
@@ -85,48 +134,13 @@ const CourseDetail = () => {
       
       setModulesData(playlistModules);
       setIsLoading(false);
+    } else if (!loading && error) {
+      // If there was an error loading the playlist, fall back to default modules
+      console.error("Using default modules due to YouTube API error:", error);
+      setModulesData(defaultModulesData);
+      setIsLoading(false);
     }
-  }, [course, videos]);
-
-  const defaultModulesData: ModuleData[] = [
-    { 
-      title: "Introduction to Drones", 
-      duration: "45 mins",
-      description: "Overview of drone technology and applications",
-      videoId: "O-b1_T_1xGs",
-      completed: true,
-      lessons: [
-        { title: "What are Drones?", duration: "10 mins", completed: true },
-        { title: "History of Drone Technology", duration: "15 mins", completed: true },
-        { title: "Types of Drones", duration: "20 mins", completed: true }
-      ]
-    },
-    { 
-      title: "Basic Flight Controls", 
-      duration: "1 hour",
-      description: "Learn the fundamental controls for piloting a drone",
-      videoId: "U1Z-iqLVHnk",
-      completed: false,
-      lessons: [
-        { title: "Pre-Flight Checklist", duration: "12 mins", completed: false },
-        { title: "Takeoff and Landing", duration: "18 mins", completed: false },
-        { title: "Basic Maneuvers", duration: "15 mins", completed: false },
-        { title: "Emergency Procedures", duration: "15 mins", completed: false }
-      ]
-    },
-    { 
-      title: "Understanding Flight Dynamics", 
-      duration: "1.5 hours",
-      description: "Learn about drone physics and how they affect flight",
-      videoId: "E9j8GtuQUHk",
-      completed: false,
-      lessons: [
-        { title: "Principles of Flight", duration: "20 mins", completed: false },
-        { title: "Weather Considerations", duration: "25 mins", completed: false },
-        { title: "Flight Planning", duration: "25 mins", completed: false }
-      ]
-    }
-  ];
+  }, [course, videos, loading, error, hasPlaylist]);
 
   const toggleModuleExpand = (index: number) => {
     setExpandedModules(prev => 
@@ -250,7 +264,7 @@ const CourseDetail = () => {
                           {module.completed ? (
                             <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
                           ) : (
-                            <PlayCircle className="h-5 w-5 text-white/60 mr-2" />
+                            <Video className="h-5 w-5 text-white/60 mr-2" />
                           )}
                           <span className="font-medium truncate">{module.title}</span>
                         </div>

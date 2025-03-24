@@ -61,11 +61,14 @@ export const useYouTubePlaylist = (playlistId: string | undefined) => {
   const [videos, setVideos] = useState<YouTubeVideo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const maxRetries = 3;
 
   useEffect(() => {
     // Reset state on playlistId change to avoid stale data
     setVideos([]);
     setError(null);
+    setLoading(true);
     
     // Don't fetch if no playlistId is provided
     if (!playlistId) {
@@ -75,7 +78,7 @@ export const useYouTubePlaylist = (playlistId: string | undefined) => {
 
     const fetchPlaylistItems = async () => {
       try {
-        setLoading(true);
+        console.log(`Fetching playlist items for ID: ${playlistId}`);
         
         // We'll use this to collect all videos from the playlist across multiple pages
         let allVideos: YouTubeVideo[] = [];
@@ -92,10 +95,13 @@ export const useYouTubePlaylist = (playlistId: string | undefined) => {
           );
           
           if (!playlistResponse.ok) {
-            throw new Error('Failed to fetch playlist data');
+            const errorData = await playlistResponse.json().catch(() => ({}));
+            console.error("YouTube API Error:", errorData);
+            throw new Error(`Failed to fetch playlist data: ${playlistResponse.status} ${playlistResponse.statusText}`);
           }
           
           const playlistData = await playlistResponse.json();
+          console.log(`Retrieved playlist page with ${playlistData.items?.length || 0} items`);
           
           if (!playlistData.items || playlistData.items.length === 0) {
             // If there are no items on the first page, set empty array and exit
@@ -110,7 +116,7 @@ export const useYouTubePlaylist = (playlistId: string | undefined) => {
           
           // Extract video IDs from this page of playlist items
           const videoIds = playlistData.items
-            .map((item: any) => item.snippet.resourceId.videoId)
+            .map((item: any) => item.snippet?.resourceId?.videoId)
             .filter(Boolean) // Filter out any undefined/null values
             .join(',');
           
@@ -121,7 +127,9 @@ export const useYouTubePlaylist = (playlistId: string | undefined) => {
             );
             
             if (!videoDetailsResponse.ok) {
-              throw new Error('Failed to fetch video details');
+              const errorData = await videoDetailsResponse.json().catch(() => ({}));
+              console.error("YouTube Video Details API Error:", errorData);
+              throw new Error(`Failed to fetch video details: ${videoDetailsResponse.status} ${videoDetailsResponse.statusText}`);
             }
             
             const videoDetailsData = await videoDetailsResponse.json();
@@ -145,17 +153,29 @@ export const useYouTubePlaylist = (playlistId: string | undefined) => {
         
         // Update state with all videos
         setVideos(allVideos);
-        console.log(`Fetched ${allVideos.length} videos from YouTube playlist`);
+        console.log(`Successfully fetched ${allVideos.length} videos from YouTube playlist`);
       } catch (err) {
         console.error('Error fetching YouTube data:', err);
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        setError(errorMessage);
+        
+        // Retry logic
+        if (retryCount < maxRetries) {
+          console.log(`Retrying fetch (${retryCount + 1}/${maxRetries})...`);
+          setRetryCount(prev => prev + 1);
+          // We'll retry with an exponential backoff
+          setTimeout(() => {
+            fetchPlaylistItems();
+          }, 1000 * Math.pow(2, retryCount));
+          return;
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchPlaylistItems();
-  }, [playlistId]);
+  }, [playlistId, retryCount]);
 
   return { videos, loading, error };
 };

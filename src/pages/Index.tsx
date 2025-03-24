@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -16,10 +17,10 @@ const Index = () => {
     <div className="min-h-screen bg-neutral-100">
       <Navigation />
       
-      {/* Hero Section - Updated with new tagline */}
+      {/* Hero Section - Updated with new background image */}
       <section className="relative bg-flytbase-primary text-white py-20 overflow-hidden">
         <div className="absolute inset-0 opacity-30">
-          <div className="absolute inset-0 bg-[url('../lovable-uploads/21a681d0-8a71-4d3d-907a-38d6aeed53d4.png')] bg-cover bg-center bg-no-repeat"></div>
+          <div className="absolute inset-0 bg-[url('../lovable-uploads/c9cca1b7-22a0-4793-9b9b-aec57fef1c70.png')] bg-cover bg-center bg-no-repeat"></div>
           <div className="absolute inset-0 bg-gradient-to-r from-flytbase-primary via-flytbase-primary/80 to-transparent"></div>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -130,53 +131,6 @@ const Index = () => {
           </div>
         </section>
       )}
-      
-      {/* Features Section */}
-      <section className="py-16 bg-flytbase-primary text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold">Why Choose FlytBase Academy</h2>
-            <p className="text-lg text-neutral-300 mt-4 max-w-3xl mx-auto">
-              Our comprehensive curriculum and industry partnerships ensure you get the skills needed in today's drone technology landscape
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                icon: <BookOpen className="h-10 w-10" />,
-                title: "Expert-Led Courses",
-                description: "Learn from industry professionals with years of real-world drone experience"
-              },
-              {
-                icon: <Award className="h-10 w-10" />,
-                title: "Industry Certification",
-                description: "Earn recognized certifications that boost your career prospects"
-              },
-              {
-                icon: <Layers className="h-10 w-10" />,
-                title: "Hands-on Projects",
-                description: "Apply your knowledge through practical exercises and simulations"
-              },
-              {
-                icon: <Users className="h-10 w-10" />,
-                title: "Community Support",
-                description: "Join a global community of drone enthusiasts and professionals"
-              }
-            ].map((feature, index) => (
-              <Card key={index} className="border-none bg-[#1A1F2C] shadow-card hover-lift animate-fade-in" style={{ '--delay': index * 0.1 + 2 } as React.CSSProperties}>
-                <CardContent className="pt-6">
-                  <div className="rounded-full bg-flytbase-secondary/20 p-3 inline-flex text-flytbase-secondary mb-4">
-                    {feature.icon}
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2 text-white">{feature.title}</h3>
-                  <p className="text-neutral-300">{feature.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
       
       {/* Course Categories */}
       <section className="py-16 bg-[#121723]">

@@ -234,7 +234,7 @@ const Index = () => {
             </div>
           </div>
           <div className="border-t border-neutral-800 pt-8 mt-8 text-center">
-            <p>© 2023 FlytBase Academy. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} FlytBase Academy. All rights reserved.</p>
           </div>
         </div>
       </footer>

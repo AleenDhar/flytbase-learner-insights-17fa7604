@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import CourseCard, { CourseProps } from '@/components/CourseCard';
@@ -6,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BookOpen, Search } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 // Mock data for courses
 export const coursesData: CourseProps[] = [
@@ -136,14 +134,14 @@ const Courses = () => {
       </section>
       
       {/* Search Bar */}
-      <div className="bg-[#1A1F2C] border-b border-white/5 sticky top-16 z-10">
+      <div className="bg-[#131A27] border-b border-white/5 sticky top-16 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 h-5 w-5" />
             <Input
               type="text"
               placeholder="Search courses by title or description..."
-              className="pl-10 w-full bg-[#222631] border-white/10 text-white"
+              className="pl-10 w-full bg-[#1A2133] border-white/10 text-white"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />

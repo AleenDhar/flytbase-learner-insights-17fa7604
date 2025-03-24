@@ -1,25 +1,23 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Play, BookOpen, ArrowRight } from 'lucide-react';
+import { BookOpen, Clock, Award, Youtube } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import WatchlistButton from './WatchlistButton';
 
 export interface CourseProps {
   id: string;
   title: string;
   description: string;
-  level: 'Beginner' | 'Intermediate' | 'Advanced';
+  level: string;
   duration: string;
   modules: number;
   thumbnail: string;
-  youtubePlaylistId?: string;
+  youtubePlaylistId?: string; // Make this optional
 }
 
-const CourseCard: React.FC<CourseProps> = ({
+const CourseCard = ({
   id,
   title,
   description,
@@ -28,57 +26,69 @@ const CourseCard: React.FC<CourseProps> = ({
   modules,
   thumbnail,
   youtubePlaylistId
-}) => {
-  const { user } = useAuth();
-  
-  const getLevelColor = (level: string) => {
-    switch(level) {
-      case 'Beginner': return 'bg-green-900/40 text-green-200 hover:bg-green-900/60';
-      case 'Intermediate': return 'bg-flytbase-accent-yellow/10 text-flytbase-accent-yellow hover:bg-flytbase-accent-yellow/20';
-      case 'Advanced': return 'bg-flytbase-secondary/10 text-flytbase-secondary hover:bg-flytbase-secondary/20';
-      default: return 'bg-gray-800 text-gray-200 hover:bg-gray-700';
+}: CourseProps) => {
+  // Get badge color based on level
+  const getBadgeVariant = (level: string) => {
+    switch (level.toLowerCase()) {
+      case 'beginner':
+        return 'bg-blue-950/60 text-blue-200';
+      case 'intermediate':
+        return 'bg-yellow-900/60 text-yellow-200';
+      case 'advanced':
+        return 'bg-red-950/60 text-red-200';
+      default:
+        return 'bg-gray-800/60 text-gray-200';
     }
   };
 
   return (
-    <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 group bg-[#1A1F2C] border-white/5">
-      <div className="relative h-48 overflow-hidden">
-        <img 
-          src={thumbnail} 
-          alt={title} 
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-[#131A27] border-white/5 text-white h-full flex flex-col">
+      <div className="aspect-video overflow-hidden">
+        <img
+          src={thumbnail}
+          alt={title}
+          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
         />
-        {youtubePlaylistId && (
-          <div className="absolute inset-0 bg-flytbase-primary/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <Play className="h-12 w-12 text-white" />
-          </div>
-        )}
-        <div className="absolute top-3 left-3 flex gap-2">
-          <Badge className={`${getLevelColor(level)}`}>{level}</Badge>
-        </div>
       </div>
-      <CardContent className="p-5">
-        <div className="flex justify-between items-center mb-2 text-sm text-neutral-400">
-          <div className="flex items-center">
-            <BookOpen className="h-4 w-4 mr-1" />
-            <span>{modules} Modules</span>
-          </div>
-          <span>{duration}</span>
-        </div>
-        <h3 className="text-xl font-semibold mb-2 line-clamp-2 text-white">{title}</h3>
-        <p className="text-neutral-300 mb-4 line-clamp-3">{description}</p>
-        <div className="flex flex-col sm:flex-row gap-2">
-          <Link to={`/courses/${id}`} className="flex-1">
-            <Button className="w-full group bg-flytbase-secondary hover:bg-flytbase-secondary/90">
-              View Course
-              <ArrowRight className="ml-2 h-4 w-4 transform transition-transform group-hover:translate-x-1" />
-            </Button>
-          </Link>
-          {user && (
-            <WatchlistButton courseId={id} />
+      
+      <CardHeader className="pb-2">
+        <div className="flex justify-between items-start">
+          <Badge className={`${getBadgeVariant(level)}`}>{level}</Badge>
+          {youtubePlaylistId && (
+            <Badge variant="outline" className="border-white/10 text-white/70 flex items-center">
+              <Youtube className="mr-1 h-3 w-3" />
+              Playlist
+            </Badge>
           )}
         </div>
+        <h3 className="text-xl font-semibold mt-2 text-white">{title}</h3>
+      </CardHeader>
+      
+      <CardContent className="text-white/70">
+        <p className="line-clamp-2">{description}</p>
+        
+        <div className="flex flex-wrap gap-4 mt-4">
+          <div className="flex items-center text-white/60 text-sm">
+            <BookOpen className="mr-1.5 h-4 w-4" />
+            <span>{modules} Modules</span>
+          </div>
+          <div className="flex items-center text-white/60 text-sm">
+            <Clock className="mr-1.5 h-4 w-4" />
+            <span>{duration}</span>
+          </div>
+        </div>
       </CardContent>
+      
+      <CardFooter className="mt-auto pt-4">
+        <Link to={`/courses/${id}`} className="w-full">
+          <Button 
+            variant="default" 
+            className="w-full bg-flytbase-secondary hover:bg-flytbase-secondary/90"
+          >
+            View Course
+          </Button>
+        </Link>
+      </CardFooter>
     </Card>
   );
 };

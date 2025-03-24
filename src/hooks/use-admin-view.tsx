@@ -7,10 +7,14 @@ export function useAdminView() {
     return saved === "true";
   });
   
+  useEffect(() => {
+    // Ensure localStorage is updated when viewAsUser changes
+    localStorage.setItem("admin-view-as-user", viewAsUser ? "true" : "false");
+  }, [viewAsUser]);
+  
   const toggleView = () => {
     const newValue = !viewAsUser;
     setViewAsUser(newValue);
-    localStorage.setItem("admin-view-as-user", newValue ? "true" : "false");
     
     // Reload or redirect based on new view
     if (newValue) {
@@ -22,5 +26,9 @@ export function useAdminView() {
     }
   };
   
-  return { viewAsUser, toggleView, isAdminViewingAsUser: () => window.sessionStorage.getItem("adminViewingAsUser") === "true" };
+  const isAdminViewingAsUser = () => {
+    return viewAsUser;
+  };
+  
+  return { viewAsUser, toggleView, isAdminViewingAsUser };
 }

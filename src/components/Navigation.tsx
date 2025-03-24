@@ -20,7 +20,7 @@ const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
-  const { isAdminViewingAsUser } = useAdminView();
+  const { viewAsUser } = useAdminView();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -49,7 +49,7 @@ const Navigation = () => {
     navItems.push({ name: 'Dashboard', path: '/dashboard' });
     
     // Only add admin link if user is admin and not viewing as regular user
-    if (isAdmin && !isAdminViewingAsUser()) {
+    if (isAdmin && !viewAsUser) {
       navItems.push({ name: 'Admin', path: '/admin' });
     }
   }
@@ -68,7 +68,7 @@ const Navigation = () => {
   };
 
   // Show admin badge in dropdown if viewing as regular user
-  const adminViewingAsUser = isAdminViewingAsUser();
+  const adminViewingAsUser = viewAsUser;
 
   return (
     <nav className="bg-flytbase-primary border-b border-white/10 sticky top-0 z-10">

@@ -22,9 +22,12 @@ import {
   CheckCircle, 
   XCircle,
   AlertCircle,
-  ArrowRight
+  ArrowRight,
+  Award
 } from 'lucide-react';
 import type { AssessmentProps } from '@/components/AssessmentCard';
+import CertificateForm, { CertificateFormValues } from '@/components/CertificateForm';
+import Certificate from '@/components/Certificate';
 
 // Mock data for the assessment
 const assessmentData: AssessmentProps = {
@@ -113,6 +116,9 @@ const AssessmentDetail = () => {
     incorrectAnswers: number,
     unanswered: number
   } | null>(null);
+  const [showCertificateForm, setShowCertificateForm] = useState(false);
+  const [certificateData, setCertificateData] = useState<CertificateFormValues | null>(null);
+  const [showCertificate, setShowCertificate] = useState(false);
   
   // Load assessment data based on the assessmentId
   useEffect(() => {
@@ -199,6 +205,12 @@ const AssessmentDetail = () => {
       title: "Assessment Completed",
       description: `You scored ${result.score}% on this assessment.`,
     });
+  };
+
+  const handleCertificateSubmit = (data: CertificateFormValues) => {
+    setCertificateData(data);
+    setShowCertificateForm(false);
+    setShowCertificate(true);
   };
   
   // Generate UI based on current state
@@ -384,6 +396,27 @@ const AssessmentDetail = () => {
                     <p className="text-neutral-400 text-sm">Unanswered</p>
                   </div>
                 </div>
+
+                {results?.score && results.score >= 70 && (
+                  <div className="bg-green-900/20 border border-green-700/30 rounded-lg p-4 text-center mt-6">
+                    <div className="flex justify-center text-green-400 mb-3">
+                      <Award className="h-10 w-10" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">
+                      Congratulations! You've Qualified for a Certificate
+                    </h3>
+                    <p className="text-neutral-300 mb-4">
+                      You've passed this assessment with a score of {results.score}%. You can now claim your official certificate.
+                    </p>
+                    <Button 
+                      onClick={() => setShowCertificateForm(true)}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      <Award className="mr-2 h-4 w-4" />
+                      Claim Certificate
+                    </Button>
+                  </div>
+                )}
                 
                 <Tabs defaultValue="summary" className="mt-6">
                   <TabsList className="bg-[#212636] border-white/5">
@@ -474,6 +507,27 @@ const AssessmentDetail = () => {
     <div className="min-h-screen bg-flytbase-primary text-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {renderContent()}
+        
+        {showCertificateForm && (
+          <CertificateForm 
+            isOpen={showCertificateForm}
+            onClose={() => setShowCertificateForm(false)}
+            onSubmit={handleCertificateSubmit}
+            assessmentTitle={assessmentData.title}
+            score={results?.score || 0}
+          />
+        )}
+        
+        {showCertificate && certificateData && (
+          <Certificate 
+            fullName={certificateData.fullName}
+            designation={certificateData.designation}
+            email={certificateData.email}
+            assessmentTitle={assessmentData.title}
+            score={results?.score || 0}
+            onClose={() => setShowCertificate(false)}
+          />
+        )}
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -11,6 +12,7 @@ interface AdminRouteProps {
 const ADMIN_EMAILS = [
   "admin@flytbase.com",
   "admin2@flytbase.com",
+  "bdteam@flytbase.com", // Added bdteam@flytbase.com as admin
 ];
 
 const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {

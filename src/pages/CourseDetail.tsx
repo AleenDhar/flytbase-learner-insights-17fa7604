@@ -61,6 +61,8 @@ const CourseDetail = () => {
     if (!course) return;
 
     if (course.youtubePlaylistId && videos.length > 0) {
+      console.log(`Processing ${videos.length} videos for course modules`);
+      
       const playlistModules = videos.map((video: YouTubeVideo, index: number): ModuleData => ({
         title: video.title,
         duration: video.duration,
@@ -72,6 +74,7 @@ const CourseDetail = () => {
           { title: video.title, duration: video.duration, completed: false }
         ]
       }));
+      
       setModulesData(playlistModules);
       setIsLoading(false);
     } else if (!course.youtubePlaylistId) {
@@ -219,7 +222,7 @@ const CourseDetail = () => {
                   <div className="flex items-start">
                     <AlertCircle className="h-5 w-5 text-red-400 mr-2 flex-shrink-0 mt-0.5" />
                     <p className="text-sm text-red-300">
-                      Error loading course content. Please try again later.
+                      Error loading course content: {error}
                     </p>
                   </div>
                 </div>
@@ -301,25 +304,14 @@ const CourseDetail = () => {
                   </div>
                 ) : modulesData.length > 0 ? (
                   <div className="aspect-video">
-                    {modulesData[activeModule]?.playlistId ? (
-                      <iframe 
-                        className="w-full h-full"
-                        src={`https://www.youtube.com/embed/${modulesData[activeModule].videoId}?rel=0`}
-                        title={modulesData[activeModule].title}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      ></iframe>
-                    ) : (
-                      <iframe 
-                        className="w-full h-full"
-                        src={`https://www.youtube.com/embed/${modulesData[activeModule].videoId}?rel=0`}
-                        title={modulesData[activeModule].title}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      ></iframe>
-                    )}
+                    <iframe 
+                      className="w-full h-full"
+                      src={`https://www.youtube.com/embed/${modulesData[activeModule].videoId}?rel=0`}
+                      title={modulesData[activeModule].title}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
                   </div>
                 ) : (
                   <div className="aspect-video bg-[#0F1623] flex items-center justify-center">

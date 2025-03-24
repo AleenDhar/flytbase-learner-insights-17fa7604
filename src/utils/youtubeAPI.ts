@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 
 // Interface for a single YouTube video item
@@ -67,46 +66,75 @@ export const useYouTubePlaylist = (playlistId: string) => {
       try {
         setLoading(true);
         
-        // First fetch playlist items (this gives us video IDs)
-        const playlistResponse = await fetch(
-          `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${API_KEY}`
-        );
+        // We'll use this to collect all videos from the playlist across multiple pages
+        let allVideos: YouTubeVideo[] = [];
+        let nextPageToken: string | undefined = undefined;
         
-        if (!playlistResponse.ok) {
-          throw new Error('Failed to fetch playlist data');
-        }
+        // Loop to fetch all pages of playlist items
+        do {
+          // Construct URL with page token if available
+          const pageParam = nextPageToken ? `&pageToken=${nextPageToken}` : '';
+          
+          // Fetch this page of playlist items
+          const playlistResponse = await fetch(
+            `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}${pageParam}&key=${API_KEY}`
+          );
+          
+          if (!playlistResponse.ok) {
+            throw new Error('Failed to fetch playlist data');
+          }
+          
+          const playlistData = await playlistResponse.json();
+          
+          if (!playlistData.items || playlistData.items.length === 0) {
+            // If there are no items on the first page, set empty array and exit
+            if (allVideos.length === 0) {
+              setVideos([]);
+              setLoading(false);
+              return;
+            }
+            // Otherwise, we've reached the end of pagination
+            break;
+          }
+          
+          // Extract video IDs from this page of playlist items
+          const videoIds = playlistData.items
+            .map((item: any) => item.snippet.resourceId.videoId)
+            .filter(Boolean) // Filter out any undefined/null values
+            .join(',');
+          
+          // If we have video IDs, fetch their details
+          if (videoIds) {
+            const videoDetailsResponse = await fetch(
+              `https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet&id=${videoIds}&key=${API_KEY}`
+            );
+            
+            if (!videoDetailsResponse.ok) {
+              throw new Error('Failed to fetch video details');
+            }
+            
+            const videoDetailsData = await videoDetailsResponse.json();
+            
+            // Map the response to our simpler format
+            const processedVideos = videoDetailsData.items.map((video: any) => ({
+              id: video.id,
+              title: video.snippet.title,
+              duration: formatDuration(video.contentDetails.duration),
+              thumbnail: video.snippet.thumbnails.medium.url
+            }));
+            
+            // Add these videos to our accumulator
+            allVideos = [...allVideos, ...processedVideos];
+          }
+          
+          // Update the page token for the next iteration
+          nextPageToken = playlistData.nextPageToken;
+          
+        } while (nextPageToken); // Continue until there are no more pages
         
-        const playlistData = await playlistResponse.json();
-        
-        if (!playlistData.items || playlistData.items.length === 0) {
-          setVideos([]);
-          setLoading(false);
-          return;
-        }
-        
-        // Extract video IDs from playlist items
-        const videoIds = playlistData.items.map((item: any) => item.snippet.resourceId.videoId).join(',');
-        
-        // Then fetch video details (this gives us duration)
-        const videoDetailsResponse = await fetch(
-          `https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet&id=${videoIds}&key=${API_KEY}`
-        );
-        
-        if (!videoDetailsResponse.ok) {
-          throw new Error('Failed to fetch video details');
-        }
-        
-        const videoDetailsData = await videoDetailsResponse.json();
-        
-        // Map the response to our simpler format
-        const processedVideos = videoDetailsData.items.map((video: any) => ({
-          id: video.id,
-          title: video.snippet.title,
-          duration: formatDuration(video.contentDetails.duration),
-          thumbnail: video.snippet.thumbnails.medium.url
-        }));
-        
-        setVideos(processedVideos);
+        // Update state with all videos
+        setVideos(allVideos);
+        console.log(`Fetched ${allVideos.length} videos from YouTube playlist`);
       } catch (err) {
         console.error('Error fetching YouTube data:', err);
         setError(err instanceof Error ? err.message : 'Unknown error');

@@ -9,6 +9,113 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      assessment_attempts: {
+        Row: {
+          assessment_id: string | null
+          attempt_number: number
+          finished_at: string | null
+          id: string
+          score: number | null
+          started_at: string
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          assessment_id?: string | null
+          attempt_number: number
+          finished_at?: string | null
+          id?: string
+          score?: number | null
+          started_at?: string
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          assessment_id?: string | null
+          attempt_number?: number
+          finished_at?: string | null
+          id?: string
+          score?: number | null
+          started_at?: string
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_attempts_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assessments: {
+        Row: {
+          category: string | null
+          course_id: string
+          created_at: string
+          description: string | null
+          difficulty: string | null
+          id: string
+          thumbnail: string | null
+          time_limit: number | null
+          title: string
+        }
+        Insert: {
+          category?: string | null
+          course_id: string
+          created_at?: string
+          description?: string | null
+          difficulty?: string | null
+          id?: string
+          thumbnail?: string | null
+          time_limit?: number | null
+          title: string
+        }
+        Update: {
+          category?: string | null
+          course_id?: string
+          created_at?: string
+          description?: string | null
+          difficulty?: string | null
+          id?: string
+          thumbnail?: string | null
+          time_limit?: number | null
+          title?: string
+        }
+        Relationships: []
+      }
+      courses: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          playlist_id: string | null
+          thumbnail: string | null
+          title: string
+          video_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          playlist_id?: string | null
+          thumbnail?: string | null
+          title: string
+          video_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          playlist_id?: string | null
+          thumbnail?: string | null
+          title?: string
+          video_count?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -35,6 +142,76 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      question_options: {
+        Row: {
+          id: string
+          is_correct: boolean
+          option_text: string
+          question_id: string | null
+        }
+        Insert: {
+          id?: string
+          is_correct: boolean
+          option_text: string
+          question_id?: string | null
+        }
+        Update: {
+          id?: string
+          is_correct?: boolean
+          option_text?: string
+          question_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_options_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      questions: {
+        Row: {
+          after_videoend: boolean | null
+          assessment_id: string | null
+          created_at: string
+          difficulty: string | null
+          id: string
+          question_text: string
+          question_type: string
+          video_id: string | null
+        }
+        Insert: {
+          after_videoend?: boolean | null
+          assessment_id?: string | null
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          question_text: string
+          question_type: string
+          video_id?: string | null
+        }
+        Update: {
+          after_videoend?: boolean | null
+          assessment_id?: string | null
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          question_text?: string
+          question_type?: string
+          video_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questions_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       testimonials: {
         Row: {
@@ -68,6 +245,55 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      user_answers: {
+        Row: {
+          attempt_id: string | null
+          created_at: string
+          essay_text: string | null
+          id: string
+          question_id: string | null
+          selected_option_id: string | null
+        }
+        Insert: {
+          attempt_id?: string | null
+          created_at?: string
+          essay_text?: string | null
+          id?: string
+          question_id?: string | null
+          selected_option_id?: string | null
+        }
+        Update: {
+          attempt_id?: string | null
+          created_at?: string
+          essay_text?: string | null
+          id?: string
+          question_id?: string | null
+          selected_option_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_answers_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "assessment_attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_answers_selected_option_id_fkey"
+            columns: ["selected_option_id"]
+            isOneToOne: false
+            referencedRelation: "question_options"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_courses: {
         Row: {
@@ -129,6 +355,48 @@ export type Database = {
         }
         Relationships: []
       }
+      user_video_answers: {
+        Row: {
+          created_at: string
+          id: string
+          is_correct: boolean
+          question_id: string | null
+          selected_option_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_correct: boolean
+          question_id?: string | null
+          selected_option_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_correct?: boolean
+          question_id?: string | null
+          selected_option_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_video_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "video_questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_video_answers_selected_option_id_fkey"
+            columns: ["selected_option_id"]
+            isOneToOne: false
+            referencedRelation: "video_question_options"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_watchlist: {
         Row: {
           added_at: string
@@ -147,6 +415,89 @@ export type Database = {
           course_id?: string
           id?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      video_question_options: {
+        Row: {
+          id: string
+          is_correct: boolean
+          option_text: string
+          question_id: string | null
+        }
+        Insert: {
+          id?: string
+          is_correct: boolean
+          option_text: string
+          question_id?: string | null
+        }
+        Update: {
+          id?: string
+          is_correct?: boolean
+          option_text?: string
+          question_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_question_options_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "video_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_questions: {
+        Row: {
+          created_at: string
+          id: string
+          question_text: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          question_text: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          question_text?: string
+          video_id?: string
+        }
+        Relationships: []
+      }
+      videos: {
+        Row: {
+          about: string | null
+          course_id: string
+          created_at: string
+          for_whom: string | null
+          id: string
+          thumbnail: string | null
+          title: string
+          youtube_video_id: string | null
+        }
+        Insert: {
+          about?: string | null
+          course_id: string
+          created_at?: string
+          for_whom?: string | null
+          id?: string
+          thumbnail?: string | null
+          title: string
+          youtube_video_id?: string | null
+        }
+        Update: {
+          about?: string | null
+          course_id?: string
+          created_at?: string
+          for_whom?: string | null
+          id?: string
+          thumbnail?: string | null
+          title?: string
+          youtube_video_id?: string | null
         }
         Relationships: []
       }

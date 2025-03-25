@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCourseContent } from '@/hooks/use-course-content';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -8,6 +8,8 @@ import { AlertCircle, BookOpen, HelpCircle, Check, X } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { toast } from '@/hooks/use-toast';
 import useCourseProgress from '@/hooks/use-course-progress';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 
 interface CourseContentSectionProps {
   videoId: string;
@@ -16,6 +18,7 @@ interface CourseContentSectionProps {
 }
 
 const CourseContentSection: React.FC<CourseContentSectionProps> = ({ videoId, courseId, onQuizComplete }) => {
+  const { user } = useAuth();
   const { summary, questions, loading, error } = useCourseContent(videoId);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: string }>({});
@@ -47,8 +50,36 @@ const CourseContentSection: React.FC<CourseContentSectionProps> = ({ videoId, co
     }));
   };
   
-  const handleNextQuestion = () => {
-    if (!questions) return;
+  const handleNextQuestion = async () => {
+    if (!questions || !user) return;
+    
+    // Record user's answer in the database
+    try {
+      if (questions[currentQuestionIndex]) {
+        const isCorrect = selectedOptions[currentQuestionIndex] === questions[currentQuestionIndex].correctAnswer;
+        
+        // Find the original question ID from the DB
+        const { data: questionData } = await supabase
+          .from('video_questions')
+          .select('id')
+          .eq('video_id', videoId)
+          .eq('question_text', questions[currentQuestionIndex].question)
+          .single();
+        
+        if (questionData?.id) {
+          await supabase
+            .from('user_video_answers')
+            .insert({
+              user_id: user.id,
+              question_id: questionData.id,
+              selected_option_id: selectedOptions[currentQuestionIndex],
+              is_correct: isCorrect
+            });
+        }
+      }
+    } catch (error) {
+      console.error('Error saving answer:', error);
+    }
     
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);

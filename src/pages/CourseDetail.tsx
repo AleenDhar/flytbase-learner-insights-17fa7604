@@ -4,13 +4,13 @@ import { useParams } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import { List, PlayCircle } from 'lucide-react';
 import { CourseProps } from '@/components/CourseCard';
-import { coursesData } from './Courses';
 import { useYouTubePlaylist } from '@/utils/youtubeAPI';
 import CourseHeader from '@/components/course/CourseHeader';
 import CourseModuleList from '@/components/course/CourseModuleList';
 import CourseVideoPlayer from '@/components/course/CourseVideoPlayer';
 import CourseContentDetails from '@/components/course/CourseContentDetails';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface LessonData {
   title: string;
@@ -81,19 +81,102 @@ const CourseDetail = () => {
   const [moduleCompleted, setModuleCompleted] = useState(false);
 
   useEffect(() => {
-    const foundCourse = coursesData.find(c => c.id === courseId) || null;
-    setCourse(foundCourse);
-    setIsLoading(true);
+    const fetchCourse = async () => {
+      setIsLoading(true);
+      
+      try {
+        // First try to fetch from Supabase
+        const { data: courseData, error: courseError } = await supabase
+          .from('courses')
+          .select('*')
+          .eq('id', courseId)
+          .single();
+        
+        if (courseError || !courseData) {
+          // If not found in Supabase, use the mock data
+          const mockCourse = {
+            id: courseId || '',
+            title: 'Drone Flight Fundamentals',
+            description: 'Master the essentials of drone piloting with our comprehensive course.',
+            category: 'Drone Piloting',
+            level: 'Beginner',
+            modules: 3,
+            duration: '3 hours',
+            instructorName: 'John Smith',
+            instructorTitle: 'Chief Drone Pilot',
+            youtubePlaylistId: undefined,
+            thumbnail: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1',
+            rating: 4.8,
+            reviews: 120,
+          };
+          
+          setCourse(mockCourse);
+          setHasPlaylist(false);
+          setModulesData(defaultModulesData);
+          setIsLoading(false);
+          setPlaylistId(undefined);
+        } else {
+          // Use Supabase data
+          const supabaseCourse = {
+            id: courseData.id,
+            title: courseData.title,
+            description: courseData.description || '',
+            category: 'Drone Piloting',
+            level: 'Beginner',
+            modules: courseData.video_count || 0,
+            duration: `${courseData.video_count || 0} modules`,
+            instructorName: 'FlytBase Academy',
+            instructorTitle: 'Drone Education Team',
+            youtubePlaylistId: courseData.playlist_id,
+            thumbnail: courseData.thumbnail || 'https://images.unsplash.com/photo-1531297484001-80022131f5a1',
+            rating: 4.5,
+            reviews: 50,
+          };
+          
+          setCourse(supabaseCourse);
+          
+          if (courseData.playlist_id) {
+            setHasPlaylist(true);
+            setPlaylistId(courseData.playlist_id);
+          } else {
+            // If no playlist, fetch videos directly
+            const { data: videosData, error: videosError } = await supabase
+              .from('videos')
+              .select('*')
+              .eq('course_id', courseId);
+            
+            if (!videosError && videosData && videosData.length > 0) {
+              // Map videos to modules format
+              const videoModules = videosData.map((video) => ({
+                title: video.title,
+                duration: '15 mins', // Default value
+                description: video.about || `${video.title} module`,
+                videoId: video.youtube_video_id,
+                completed: false,
+                lessons: [
+                  { title: video.title, duration: '15 mins', completed: false }
+                ]
+              }));
+              
+              setModulesData(videoModules);
+              setIsLoading(false);
+            } else {
+              // Fallback to default modules
+              setModulesData(defaultModulesData);
+              setIsLoading(false);
+            }
+            
+            setHasPlaylist(false);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching course:", error);
+        setCourse(null);
+        setIsLoading(false);
+      }
+    };
     
-    if (foundCourse && foundCourse.youtubePlaylistId) {
-      setHasPlaylist(true);
-      setPlaylistId(foundCourse.youtubePlaylistId);
-    } else {
-      setHasPlaylist(false);
-      setModulesData(defaultModulesData);
-      setIsLoading(false);
-      setPlaylistId(undefined);
-    }
+    fetchCourse();
   }, [courseId]);
 
   const { videos, loading, error } = useYouTubePlaylist(playlistId);
@@ -139,6 +222,42 @@ const CourseDetail = () => {
       }
     }
   }, [course, videos, loading, error, hasPlaylist]);
+
+  // Check if module has been completed by user
+  useEffect(() => {
+    const checkModuleProgress = async () => {
+      if (!courseId) return;
+      
+      try {
+        const { data: userCoursesData } = await supabase
+          .from('user_courses')
+          .select('progress, status')
+          .eq('course_id', courseId)
+          .single();
+          
+        if (userCoursesData) {
+          // Mark modules as completed based on user progress
+          const progress = userCoursesData.progress;
+          const completedModulesCount = Math.floor((progress / 100) * modulesData.length);
+          
+          const updatedModules = [...modulesData];
+          for (let i = 0; i < completedModulesCount; i++) {
+            if (updatedModules[i]) {
+              updatedModules[i].completed = true;
+            }
+          }
+          
+          setModulesData(updatedModules);
+        }
+      } catch (error) {
+        console.error("Error checking module progress:", error);
+      }
+    };
+    
+    if (modulesData.length > 0 && !isLoading) {
+      checkModuleProgress();
+    }
+  }, [courseId, modulesData.length, isLoading]);
 
   const toggleModuleExpand = (index: number) => {
     setExpandedModules(prev => 

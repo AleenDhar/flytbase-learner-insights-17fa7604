@@ -7,6 +7,20 @@ import { ArrowLeft, BookOpen, Clock, Award } from 'lucide-react';
 import WatchlistButton from '@/components/WatchlistButton';
 import { CourseProps } from '@/components/CourseCard';
 
+interface CourseStatProps {
+  icon: React.ReactNode;
+  text: string;
+}
+
+const CourseStat: React.FC<CourseStatProps> = ({ icon, text }) => {
+  return (
+    <div className="flex items-center text-neutral-300">
+      {icon}
+      <span>{text}</span>
+    </div>
+  );
+};
+
 interface CourseHeaderProps {
   course: CourseProps;
   courseId: string;
@@ -29,18 +43,18 @@ const CourseHeader: React.FC<CourseHeaderProps> = ({ course, courseId, moduleCou
             <p className="text-neutral-300 text-lg mb-6">{course.description}</p>
             
             <div className="flex flex-wrap gap-4 mb-6">
-              <div className="flex items-center text-neutral-300">
-                <BookOpen className="mr-2 h-5 w-5" />
-                <span>{moduleCount} Modules</span>
-              </div>
-              <div className="flex items-center text-neutral-300">
-                <Clock className="mr-2 h-5 w-5" />
-                <span>{course.duration}</span>
-              </div>
-              <div className="flex items-center text-neutral-300">
-                <Award className="mr-2 h-5 w-5" />
-                <span>Certificate on Completion</span>
-              </div>
+              <CourseStat 
+                icon={<BookOpen className="mr-2 h-5 w-5" />} 
+                text={`${moduleCount} Modules`} 
+              />
+              <CourseStat 
+                icon={<Clock className="mr-2 h-5 w-5" />} 
+                text={course.duration}
+              />
+              <CourseStat 
+                icon={<Award className="mr-2 h-5 w-5" />} 
+                text="Certificate on Completion"
+              />
             </div>
 
             <div className="flex gap-2">
@@ -51,18 +65,29 @@ const CourseHeader: React.FC<CourseHeaderProps> = ({ course, courseId, moduleCou
             </div>
           </div>
           
-          <div className="hidden md:block">
-            <div className="rounded-lg overflow-hidden shadow-xl">
-              <img 
-                src={course.thumbnail} 
-                alt={course.title}
-                className="w-full h-auto object-cover"
-              />
-            </div>
-          </div>
+          <CourseHeaderThumbnail thumbnailUrl={course.thumbnail} courseTitle={course.title} />
         </div>
       </div>
     </section>
+  );
+};
+
+interface CourseHeaderThumbnailProps {
+  thumbnailUrl: string;
+  courseTitle: string;
+}
+
+const CourseHeaderThumbnail: React.FC<CourseHeaderThumbnailProps> = ({ thumbnailUrl, courseTitle }) => {
+  return (
+    <div className="hidden md:block">
+      <div className="rounded-lg overflow-hidden shadow-xl">
+        <img 
+          src={thumbnailUrl} 
+          alt={courseTitle}
+          className="w-full h-auto object-cover"
+        />
+      </div>
+    </div>
   );
 };
 

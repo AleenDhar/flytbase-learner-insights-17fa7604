@@ -1,13 +1,12 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from '@/hooks/use-toast';
-import { formatDuration } from './formatters';
-import { YouTubeVideo, YouTubePlaylistResponse } from './types';
 import { 
-  YOUTUBE_API_KEY, 
-  MAX_API_RETRIES,
-  PLAYLIST_ITEMS_ENDPOINT,
-  VIDEOS_ENDPOINT
-} from './constants';
+  YouTubeVideo, 
+  YouTubePlaylistResponse 
+} from './types';
+import { formatDuration } from './formatters';
+import { fetchPlaylistVideos } from './api';
 
 /**
  * Custom hook to fetch YouTube playlist data
@@ -34,94 +33,17 @@ export const useYouTubePlaylist = (playlistId: string | undefined): YouTubePlayl
 
     let isMounted = true; // Flag to prevent state updates if component unmounts
 
-    const fetchPlaylistItems = async () => {
+    const loadPlaylistData = async () => {
       try {
         console.log(`Fetching playlist items for ID: ${playlistId}`);
         
-        // We'll use this to collect all videos from the playlist across multiple pages
-        let allVideos: YouTubeVideo[] = [];
-        let nextPageToken: string | undefined = undefined;
+        const results = await fetchPlaylistVideos(playlistId);
         
-        // Loop to fetch all pages of playlist items
-        do {
-          // Construct URL with page token if available
-          const pageParam = nextPageToken ? `&pageToken=${nextPageToken}` : '';
-          
-          // Fetch this page of playlist items
-          const playlistResponse = await fetch(
-            `${PLAYLIST_ITEMS_ENDPOINT}?part=snippet&maxResults=50&playlistId=${playlistId}${pageParam}&key=${YOUTUBE_API_KEY}`
-          );
-          
-          if (!playlistResponse.ok) {
-            const errorData = await playlistResponse.json().catch(() => ({}));
-            console.error("YouTube API Error:", errorData);
-            
-            // If we have an API key error, show a specific error message
-            if (errorData?.error?.message?.includes('API key not valid')) {
-              throw new Error('Invalid YouTube API key. Please update the key to access videos.');
-            }
-            
-            throw new Error(`Failed to fetch playlist data: ${playlistResponse.status} ${playlistResponse.statusText}`);
-          }
-          
-          const playlistData = await playlistResponse.json();
-          console.log(`Retrieved playlist page with ${playlistData.items?.length || 0} items`);
-          
-          if (!playlistData.items || playlistData.items.length === 0) {
-            // If there are no items on the first page, set empty array and exit
-            if (allVideos.length === 0) {
-              if (isMounted) {
-                setVideos([]);
-                setLoading(false);
-              }
-              return;
-            }
-            // Otherwise, we've reached the end of pagination
-            break;
-          }
-          
-          // Extract video IDs from this page of playlist items
-          const videoIds = playlistData.items
-            .map((item: any) => item.snippet?.resourceId?.videoId)
-            .filter(Boolean) // Filter out any undefined/null values
-            .join(',');
-          
-          // If we have video IDs, fetch their details
-          if (videoIds) {
-            const videoDetailsResponse = await fetch(
-              `${VIDEOS_ENDPOINT}?part=contentDetails,snippet&id=${videoIds}&key=${YOUTUBE_API_KEY}`
-            );
-            
-            if (!videoDetailsResponse.ok) {
-              const errorData = await videoDetailsResponse.json().catch(() => ({}));
-              console.error("YouTube Video Details API Error:", errorData);
-              throw new Error(`Failed to fetch video details: ${videoDetailsResponse.status} ${videoDetailsResponse.statusText}`);
-            }
-            
-            const videoDetailsData = await videoDetailsResponse.json();
-            
-            // Map the response to our simpler format
-            const processedVideos = videoDetailsData.items.map((video: any) => ({
-              id: video.id,
-              title: video.snippet.title,
-              duration: formatDuration(video.contentDetails.duration),
-              thumbnail: video.snippet.thumbnails.medium.url
-            }));
-            
-            // Add these videos to our accumulator
-            allVideos = [...allVideos, ...processedVideos];
-          }
-          
-          // Update the page token for the next iteration
-          nextPageToken = playlistData.nextPageToken;
-          
-        } while (nextPageToken); // Continue until there are no more pages
-        
-        // Update state with all videos
+        // Update state with all videos if component is still mounted
         if (isMounted) {
-          setVideos(allVideos);
-          setError(null); // Clear any previous errors
-          console.log(`Successfully fetched ${allVideos.length} videos from YouTube playlist`);
+          setVideos(results);
+          setError(null);
+          console.log(`Successfully fetched ${results.length} videos from YouTube playlist`);
         }
       } catch (err) {
         console.error('Error fetching YouTube data:', err);
@@ -140,17 +62,10 @@ export const useYouTubePlaylist = (playlistId: string | undefined): YouTubePlayl
             });
           }
           
-          // Retry logic
-          if (retryCount < MAX_API_RETRIES) {
-            console.log(`Retrying fetch (${retryCount + 1}/${MAX_API_RETRIES})...`);
+          // Retry logic implemented in fetchPlaylistVideos
+          if (retryCount < 3) {
+            console.log(`Retrying fetch (${retryCount + 1}/3)...`);
             setRetryCount(prev => prev + 1);
-            // We'll retry with an exponential backoff
-            setTimeout(() => {
-              if (isMounted) {
-                fetchPlaylistItems();
-              }
-            }, 1000 * Math.pow(2, retryCount));
-            return;
           }
         }
       } finally {
@@ -161,7 +76,7 @@ export const useYouTubePlaylist = (playlistId: string | undefined): YouTubePlayl
       }
     };
 
-    fetchPlaylistItems();
+    loadPlaylistData();
 
     // Cleanup function
     return () => {

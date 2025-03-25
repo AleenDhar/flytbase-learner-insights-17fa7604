@@ -7,6 +7,8 @@ import TestimonialSection from '@/components/TestimonialSection';
 import CTASection from '@/components/CTASection';
 import PageFooter from '@/components/PageFooter';
 import ContinueLearningSection from '@/components/ContinueLearningSection';
+import WhyFlytBaseSection from '@/components/WhyFlytBaseSection';
+import CertificationSection from '@/components/CertificationSection';
 import { useAuth } from '@/context/AuthContext';
 
 const Index = () => {
@@ -23,8 +25,14 @@ const Index = () => {
         {/* Continue Learning Section (for signed-in users) */}
         {user && <ContinueLearningSection />}
         
+        {/* Why FlytBase Academy Section */}
+        <WhyFlytBaseSection />
+        
         {/* Course Categories */}
         <CourseCategories />
+        
+        {/* Certification Section */}
+        <CertificationSection />
         
         {/* Testimonial Section */}
         <TestimonialSection />

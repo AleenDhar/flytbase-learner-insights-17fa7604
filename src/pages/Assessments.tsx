@@ -1,69 +1,13 @@
 
 import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import Navigation from '@/components/Navigation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, FileText } from 'lucide-react';
-import AssessmentCard, { AssessmentProps } from '@/components/AssessmentCard';
-
-// Mock data for assessments
-export const assessmentsData: AssessmentProps[] = [
-  {
-    id: "reg-rules",
-    title: "Drone Regulations & Safety",
-    description: "Test your knowledge of drone safety guidelines, airspace restrictions, and regulatory compliance requirements.",
-    questions: 20,
-    timeLimit: "30 minutes",
-    difficulty: "Beginner",
-    thumbnail: "https://images.unsplash.com/photo-1579267312278-4586ec569a22"
-  },
-  {
-    id: "flight-ops",
-    title: "Basic Flight Operations",
-    description: "Demonstrate your understanding of drone flight controls, pre-flight procedures, and basic maneuvers.",
-    questions: 15,
-    timeLimit: "25 minutes",
-    difficulty: "Beginner",
-    thumbnail: "https://images.unsplash.com/photo-1507582020474-9a35b7d455d9"
-  },
-  {
-    id: "advanced-maneuvers",
-    title: "Advanced Flight Maneuvers",
-    description: "Challenge your knowledge of complex flight patterns, obstacle navigation, and precision control techniques.",
-    questions: 25,
-    timeLimit: "40 minutes",
-    difficulty: "Intermediate",
-    thumbnail: "https://images.unsplash.com/photo-1508614589041-895b88991e3e"
-  },
-  {
-    id: "aerial-photo",
-    title: "Aerial Photography Techniques",
-    description: "Test your understanding of composition, camera settings, and post-processing for drone photography.",
-    questions: 20,
-    timeLimit: "35 minutes",
-    difficulty: "Intermediate",
-    thumbnail: "https://images.unsplash.com/photo-1506947411487-a56738267384"
-  },
-  {
-    id: "mapping-tech",
-    title: "Mapping & Surveying Technology",
-    description: "Evaluate your knowledge of photogrammetry, mapping software, and drone surveying methodologies.",
-    questions: 30,
-    timeLimit: "45 minutes",
-    difficulty: "Advanced",
-    thumbnail: "https://images.unsplash.com/photo-1509803874385-db7c23652552"
-  },
-  {
-    id: "emergency-proc",
-    title: "Emergency Procedures",
-    description: "Test your understanding of drone emergency protocols, recovery techniques, and risk management.",
-    questions: 15,
-    timeLimit: "20 minutes",
-    difficulty: "Advanced",
-    thumbnail: "https://images.unsplash.com/photo-1504639725590-34d0984388bd"
-  }
-];
+import AssessmentCard from '@/components/AssessmentCard';
+import { supabase } from '@/integrations/supabase/client';
 
 const Assessments = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -76,12 +20,36 @@ const Assessments = () => {
     { name: 'Advanced', value: 'Advanced' }
   ];
   
-  const filteredAssessments = assessmentsData.filter(assessment => {
+  const { data: assessmentsData, isLoading, error } = useQuery({
+    queryKey: ['assessments'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('assessments')
+        .select('*, course:courses(*)');
+      
+      if (error) {
+        throw error;
+      }
+      
+      return data.map(assessment => ({
+        id: assessment.id,
+        title: assessment.title,
+        description: assessment.description,
+        questions: assessment.questions_count || 15, // Default if not available
+        timeLimit: `${assessment.time_limit} minutes`,
+        difficulty: assessment.difficulty || 'Beginner',
+        thumbnail: assessment.thumbnail || 'https://images.unsplash.com/photo-1508614589041-895b88991e3e',
+        courseId: assessment.course_id
+      }));
+    }
+  });
+  
+  const filteredAssessments = assessmentsData?.filter(assessment => {
     const matchesSearch = assessment.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           assessment.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = activeFilter ? assessment.difficulty === activeFilter : true;
     return matchesSearch && matchesFilter;
-  });
+  }) || [];
 
   return (
     <div className="min-h-screen bg-flytbase-primary">
@@ -137,7 +105,17 @@ const Assessments = () => {
       {/* Assessment Grid */}
       <section className="py-12 bg-flytbase-primary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {filteredAssessments.length > 0 ? (
+          {isLoading ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[...Array(6)].map((_, index) => (
+                <div key={index} className="animate-pulse bg-[#1A1F2C] rounded-lg h-96"></div>
+              ))}
+            </div>
+          ) : error ? (
+            <div className="text-center py-16 text-white">
+              <p>Error loading assessments. Please try again later.</p>
+            </div>
+          ) : filteredAssessments.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredAssessments.map((assessment) => (
                 <AssessmentCard key={assessment.id} {...assessment} />

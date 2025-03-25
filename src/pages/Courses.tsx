@@ -1,84 +1,13 @@
+
 import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import Navigation from '@/components/Navigation';
-import CourseCard, { CourseProps } from '@/components/CourseCard';
+import CourseCard from '@/components/CourseCard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BookOpen, Search } from 'lucide-react';
-
-// Mock data for courses
-export const coursesData: CourseProps[] = [
-  {
-    id: "getting-started-flytbase",
-    title: "Getting Started with FlytBase",
-    description: "A comprehensive guide to using FlytBase for drone automation. Learn about FlytOS installation, FlytAPI, FlytConsole, and more.",
-    level: "Beginner",
-    duration: "2 weeks",
-    modules: 4,
-    thumbnail: "https://images.unsplash.com/photo-1473968512647-3e447244af8f",
-    youtubePlaylistId: "PLmINGqoqKHT1Y9hbHzzFUEpXHcbE4-nko"
-  },
-  {
-    id: "drone-basics",
-    title: "Drone Piloting Fundamentals",
-    description: "Learn the basics of drone piloting, from takeoff and landing to advanced maneuvers. This course covers all essential skills for beginners.",
-    level: "Beginner",
-    duration: "4 weeks",
-    modules: 8,
-    thumbnail: "https://images.unsplash.com/photo-1531297484001-80022131f5a1",
-    youtubePlaylistId: "PLZ8REt5zt2Plg5jpTAo6RvPg0H_JGvd2n"
-  },
-  {
-    id: "advanced-flight",
-    title: "Advanced Flight Operations",
-    description: "Take your piloting skills to the next level with complex operations, obstacle navigation, and emergency procedures training.",
-    level: "Intermediate",
-    duration: "6 weeks",
-    modules: 12,
-    thumbnail: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
-    youtubePlaylistId: "PLZ8REt5zt2Plg5jpTAo6RvPg0H_JGvd2n"
-  },
-  {
-    id: "drone-programming",
-    title: "Drone Programming & Automation",
-    description: "Learn to automate drone flights and operations using Python and DroneKit. Build custom solutions for various industry applications.",
-    level: "Advanced",
-    duration: "8 weeks",
-    modules: 10,
-    thumbnail: "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
-    youtubePlaylistId: "PLZ8REt5zt2Plg5jpTAo6RvPg0H_JGvd2n"
-  },
-  {
-    id: "aerial-photography",
-    title: "Aerial Photography Masterclass",
-    description: "Master the art of aerial photography with composition techniques, camera settings, and post-processing workflows.",
-    level: "Intermediate",
-    duration: "5 weeks",
-    modules: 8,
-    thumbnail: "https://images.unsplash.com/photo-1576037728058-fe4689fe765c",
-    youtubePlaylistId: "PLZ8REt5zt2Plg5jpTAo6RvPg0H_JGvd2n"
-  },
-  {
-    id: "mapping-surveying",
-    title: "Drone Mapping & Surveying",
-    description: "Learn photogrammetry and mapping techniques to create accurate 3D models and orthomosaic maps using drone imagery.",
-    level: "Advanced",
-    duration: "7 weeks",
-    modules: 9,
-    thumbnail: "https://images.unsplash.com/photo-1523427303326-1108cf995090",
-    youtubePlaylistId: "PLZ8REt5zt2Plg5jpTAo6RvPg0H_JGvd2n"
-  },
-  {
-    id: "regulations",
-    title: "Drone Regulations & Compliance",
-    description: "Understand the legal framework for drone operations, including airspace regulations, certification requirements, and flight restrictions.",
-    level: "Beginner",
-    duration: "3 weeks",
-    modules: 6,
-    thumbnail: "https://images.unsplash.com/photo-1495714096525-285e85481090",
-    youtubePlaylistId: "PLZ8REt5zt2Plg5jpTAo6RvPg0H_JGvd2n"
-  }
-];
+import { supabase } from '@/integrations/supabase/client';
 
 const Courses = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -91,12 +20,36 @@ const Courses = () => {
     { name: 'Advanced', value: 'Advanced' }
   ];
   
-  const filteredCourses = coursesData.filter(course => {
+  const { data: coursesData, isLoading, error } = useQuery({
+    queryKey: ['courses'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('courses')
+        .select('*');
+      
+      if (error) {
+        throw error;
+      }
+      
+      return data.map(course => ({
+        id: course.id,
+        title: course.title,
+        description: course.description,
+        level: course.difficulty || 'Beginner', // Default to Beginner if not specified
+        duration: `${course.video_count || 0} modules`,
+        modules: course.video_count || 0,
+        thumbnail: course.thumbnail || 'https://images.unsplash.com/photo-1531297484001-80022131f5a1',
+        youtubePlaylistId: course.playlist_id
+      }));
+    }
+  });
+  
+  const filteredCourses = coursesData?.filter(course => {
     const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           course.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = activeFilter ? course.level === activeFilter : true;
     return matchesSearch && matchesFilter;
-  });
+  }) || [];
 
   return (
     <div className="min-h-screen bg-flytbase-primary">
@@ -152,7 +105,17 @@ const Courses = () => {
       {/* Course Grid */}
       <section className="py-12 bg-flytbase-primary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {filteredCourses.length > 0 ? (
+          {isLoading ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[...Array(6)].map((_, index) => (
+                <div key={index} className="animate-pulse bg-[#1A1F2C] rounded-lg h-96"></div>
+              ))}
+            </div>
+          ) : error ? (
+            <div className="text-center py-16 text-white">
+              <p>Error loading courses. Please try again later.</p>
+            </div>
+          ) : filteredCourses.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredCourses.map((course) => (
                 <CourseCard key={course.id} {...course} />

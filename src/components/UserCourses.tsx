@@ -9,15 +9,6 @@ import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 
-// Mock course data until we integrate with a real course API
-const COURSES = [
-  { id: 'course-1', title: 'Drone Basics: Flight Principles', thumbnail: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1' },
-  { id: 'course-2', title: 'Advanced Flight Operations', thumbnail: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d' },
-  { id: 'course-3', title: 'Drone Programming & Automation', thumbnail: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c' },
-  { id: 'course-4', title: 'Aerial Photography Techniques', thumbnail: 'https://images.unsplash.com/photo-1552152974-19b9caf99137' },
-  { id: 'course-5', title: 'Drone Maintenance & Repair', thumbnail: 'https://images.unsplash.com/photo-1597733336794-12d05021d510' },
-];
-
 export interface UserCourse {
   id: string;
   course_id: string;
@@ -26,6 +17,11 @@ export interface UserCourse {
   started_at: string;
   completed_at: string | null;
   last_accessed_at: string;
+  course: {
+    id: string;
+    title: string;
+    thumbnail: string;
+  };
 }
 
 interface UserCoursesProps {
@@ -44,7 +40,7 @@ const UserCourses: React.FC<UserCoursesProps> = ({ type, limit = 3, showViewAll 
       
       let query = supabase
         .from('user_courses')
-        .select('*')
+        .select('*, course:courses(id, title, thumbnail)')
         .eq('user_id', user.id);
       
       if (type !== 'all') {
@@ -62,14 +58,6 @@ const UserCourses: React.FC<UserCoursesProps> = ({ type, limit = 3, showViewAll 
     },
     enabled: !!user,
   });
-  
-  const getCourseDetails = (courseId: string) => {
-    return COURSES.find(course => course.id === courseId) || {
-      id: courseId,
-      title: 'Unknown Course',
-      thumbnail: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1'
-    };
-  };
   
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -110,19 +98,22 @@ const UserCourses: React.FC<UserCoursesProps> = ({ type, limit = 3, showViewAll 
   return (
     <div className="space-y-4">
       {userCourses.map((userCourse) => {
-        const course = getCourseDetails(userCourse.course_id);
         return (
           <Card key={userCourse.id} className="overflow-hidden hover:shadow-md transition-shadow">
             <div className="flex">
               <div className="w-24 h-24 flex-shrink-0">
-                <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover" />
+                <img 
+                  src={userCourse.course?.thumbnail || 'https://images.unsplash.com/photo-1531297484001-80022131f5a1'} 
+                  alt={userCourse.course?.title || 'Course'} 
+                  className="w-full h-full object-cover" 
+                />
               </div>
               <CardContent className="flex-1 p-4">
                 <div className="flex justify-between items-start">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       {getStatusIcon(userCourse.status)}
-                      <h3 className="font-medium text-base line-clamp-1">{course.title}</h3>
+                      <h3 className="font-medium text-base line-clamp-1">{userCourse.course?.title || 'Unknown Course'}</h3>
                     </div>
                     <div className="mb-3">
                       <Progress value={userCourse.progress} className="h-2" />
@@ -130,7 +121,7 @@ const UserCourses: React.FC<UserCoursesProps> = ({ type, limit = 3, showViewAll 
                     </div>
                   </div>
                   <Button size="sm" variant="outline" asChild>
-                    <Link to={`/courses/${course.id}`}>
+                    <Link to={`/courses/${userCourse.course_id}`}>
                       {userCourse.status === 'completed' ? 'Review' : 'Continue'}
                     </Link>
                   </Button>

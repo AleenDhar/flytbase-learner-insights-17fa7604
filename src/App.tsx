@@ -1,8 +1,7 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
-import { AuthProvider } from "@/context/AuthContext";
 import AdminRoute from "@/components/AdminRoute";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
@@ -20,7 +19,7 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import AdminTestimonials from "@/pages/AdminTestimonials";
 import AdminCreateCourse from "@/pages/AdminCreateCourse";
 
-const AppRoutes = () => {
+function App() {
   return (
     <BrowserRouter>
       <Routes>
@@ -102,12 +101,6 @@ const AppRoutes = () => {
       </Routes>
       <Toaster />
     </BrowserRouter>
-  );
-};
-
-function App() {
-  return (
-    <AppRoutes />
   );
 }
 

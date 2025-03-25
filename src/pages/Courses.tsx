@@ -34,8 +34,8 @@ const Courses = () => {
       return data.map(course => ({
         id: course.id,
         title: course.title,
-        description: course.description,
-        level: course.difficulty || 'Beginner', // Default to Beginner if not specified
+        description: course.description || '',
+        level: 'Beginner', // Since we don't have this field in our database yet
         duration: `${course.video_count || 0} modules`,
         modules: course.video_count || 0,
         thumbnail: course.thumbnail || 'https://images.unsplash.com/photo-1531297484001-80022131f5a1',

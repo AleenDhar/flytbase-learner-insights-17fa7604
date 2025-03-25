@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -66,11 +65,19 @@ const AssessmentDetail = () => {
       
       if (error) throw error;
       
+      // Calculate the number of questions for this assessment
+      const { count, error: countError } = await supabase
+        .from('questions')
+        .select('*', { count: 'exact', head: true })
+        .eq('assessment_id', data.id);
+        
+      if (countError) throw countError;
+      
       return {
         id: data.id,
         title: data.title,
         description: data.description,
-        questions: data.questions_count || 10,
+        questions: count || 10,
         timeLimit: `${data.time_limit} minutes`,
         difficulty: data.difficulty || 'Intermediate',
         thumbnail: data.thumbnail || 'https://images.unsplash.com/photo-1508614589041-895b88991e3e',
@@ -213,13 +220,14 @@ const AssessmentDetail = () => {
     
     try {
       const { error } = await supabase
-        .from('user_assessments')
+        .from('assessment_attempts')
         .insert({
           user_id: user.id,
           assessment_id: assessmentId,
           score: score,
-          completed_at: new Date().toISOString(),
-          passed: score >= 70
+          finished_at: new Date().toISOString(),
+          status: score >= 70 ? 'passed' : 'failed',
+          attempt_number: 1
         });
       
       if (error) throw error;
@@ -233,26 +241,16 @@ const AssessmentDetail = () => {
     setShowCertificateForm(false);
     setShowCertificate(true);
     
-    // Save certificate data to database if user is logged in
-    if (user && assessmentId && results) {
-      try {
-        const { error } = await supabase
-          .from('certificates')
-          .insert({
-            user_id: user.id,
-            assessment_id: assessmentId,
-            full_name: data.fullName,
-            email: data.email,
-            designation: data.designation,
-            score: results.score,
-            issued_at: new Date().toISOString()
-          });
-        
-        if (error) throw error;
-      } catch (error) {
-        console.error('Error saving certificate:', error);
-      }
-    }
+    // Since there's no certificates table in the database yet, we'll just log the data
+    console.log('Certificate data:', {
+      user_id: user?.id,
+      assessment_id: assessmentId,
+      full_name: data.fullName,
+      email: data.email,
+      designation: data.designation,
+      score: results?.score,
+      issued_at: new Date().toISOString()
+    });
   };
   
   // Generate UI based on current state

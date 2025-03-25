@@ -17,7 +17,7 @@ export interface UserCourse {
   started_at: string;
   completed_at: string | null;
   last_accessed_at: string;
-  course: {
+  course?: {
     id: string;
     title: string;
     thumbnail: string;
@@ -40,21 +40,53 @@ const UserCourses: React.FC<UserCoursesProps> = ({ type, limit = 3, showViewAll 
       
       let query = supabase
         .from('user_courses')
-        .select('*, course:courses(id, title, thumbnail)')
+        .select('*, course_id')
         .eq('user_id', user.id);
       
       if (type !== 'all') {
         query = query.eq('status', type);
       }
       
-      const { data, error } = await query.order('last_accessed_at', { ascending: false }).limit(limit);
+      const { data: userCoursesData, error: userCoursesError } = await query
+        .order('last_accessed_at', { ascending: false })
+        .limit(limit);
       
-      if (error) {
-        console.error('Error fetching user courses:', error);
-        throw error;
+      if (userCoursesError) {
+        console.error('Error fetching user courses:', userCoursesError);
+        throw userCoursesError;
       }
       
-      return data as UserCourse[];
+      // We need to separately fetch the course details
+      if (userCoursesData && userCoursesData.length > 0) {
+        const courseIds = userCoursesData.map(uc => uc.course_id);
+        
+        const { data: coursesData, error: coursesError } = await supabase
+          .from('courses')
+          .select('id, title, thumbnail')
+          .in('id', courseIds);
+        
+        if (coursesError) {
+          console.error('Error fetching courses:', coursesError);
+          throw coursesError;
+        }
+        
+        // Map the courses to the user courses
+        const userCoursesWithCourseDetails: UserCourse[] = userCoursesData.map(userCourse => {
+          const courseDetails = coursesData.find(course => course.id === userCourse.course_id);
+          return {
+            ...userCourse,
+            course: courseDetails ? {
+              id: courseDetails.id,
+              title: courseDetails.title,
+              thumbnail: courseDetails.thumbnail || ''
+            } : undefined
+          };
+        });
+        
+        return userCoursesWithCourseDetails;
+      }
+      
+      return [];
     },
     enabled: !!user,
   });

@@ -57,7 +57,7 @@ const CourseDetail = () => {
         title: data.title,
         description: data.description || '',
         category: 'Drone Piloting',
-        level: data.difficulty || 'Beginner',
+        level: 'Beginner', // We don't have this in our database yet
         modules: data.video_count || 0,
         duration: `${data.video_count || 0} modules`,
         instructorName: 'FlytBase Academy',
@@ -268,12 +268,13 @@ const CourseDetail = () => {
                   loading={isPlaylistLoading || isVideosLoading}
                   moduleVideoId={modulesData[activeModule]?.videoId}
                   moduleTitle={modulesData[activeModule]?.title}
+                  hasModules={modulesData.length > 0}
                 />
               </div>
               
               {showContent && modulesData[activeModule] && (
                 <CourseContentDetails
-                  videoId={modulesData[activeModule]?.videoId}
+                  moduleId={modulesData[activeModule]?.videoId}
                   moduleCompleted={moduleCompleted}
                   onQuizComplete={handleQuizComplete}
                   onPreviousModule={handlePreviousModule}

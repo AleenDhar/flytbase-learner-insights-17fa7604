@@ -23,21 +23,45 @@ const Assessments = () => {
   const { data: assessmentsData, isLoading, error } = useQuery({
     queryKey: ['assessments'],
     queryFn: async () => {
+      // First, get the assessments
       const { data, error } = await supabase
         .from('assessments')
-        .select('*, course:courses(*)');
+        .select('*');
       
       if (error) {
         throw error;
       }
       
-      return data.map(assessment => ({
+      // For each assessment, count the questions
+      const assessmentsWithQuestionsCount = await Promise.all(
+        data.map(async (assessment) => {
+          const { count, error: countError } = await supabase
+            .from('questions')
+            .select('*', { count: 'exact', head: true })
+            .eq('assessment_id', assessment.id);
+            
+          if (countError) {
+            console.error('Error counting questions:', countError);
+            return {
+              ...assessment,
+              questions_count: 0
+            };
+          }
+          
+          return {
+            ...assessment,
+            questions_count: count || 0
+          };
+        })
+      );
+      
+      return assessmentsWithQuestionsCount.map(assessment => ({
         id: assessment.id,
         title: assessment.title,
-        description: assessment.description,
+        description: assessment.description || '',
         questions: assessment.questions_count || 15, // Default if not available
         timeLimit: `${assessment.time_limit} minutes`,
-        difficulty: assessment.difficulty || 'Beginner',
+        difficulty: assessment.difficulty as 'Beginner' | 'Intermediate' | 'Advanced' || 'Beginner',
         thumbnail: assessment.thumbnail || 'https://images.unsplash.com/photo-1508614589041-895b88991e3e',
         courseId: assessment.course_id
       }));
@@ -118,7 +142,17 @@ const Assessments = () => {
           ) : filteredAssessments.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredAssessments.map((assessment) => (
-                <AssessmentCard key={assessment.id} {...assessment} />
+                <AssessmentCard 
+                  key={assessment.id}
+                  id={assessment.id}
+                  title={assessment.title}
+                  description={assessment.description}
+                  questions={assessment.questions}
+                  timeLimit={assessment.timeLimit}
+                  difficulty={assessment.difficulty}
+                  thumbnail={assessment.thumbnail}
+                  courseId={assessment.courseId}
+                />
               ))}
             </div>
           ) : (

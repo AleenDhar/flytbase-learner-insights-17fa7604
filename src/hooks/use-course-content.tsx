@@ -33,12 +33,18 @@ export const useCourseContent = (videoId: string | undefined) => {
     setContent(prev => ({ ...prev, loading: true, error: null }));
     
     try {
+      console.log(`Fetching content for video ${videoId}, attempt #${retryCount + 1}`);
+      
       // 1. Fetch transcript
       const transcript = await fetchTranscript(videoId);
       
       if (!transcript) {
-        throw new Error('Failed to fetch transcript for this video. The video might not have captions available.');
+        const errorMsg = 'Failed to fetch transcript for this video. The video might not have captions available.';
+        console.error(errorMsg);
+        throw new Error(errorMsg);
       }
+      
+      console.log(`Successfully fetched transcript with ${transcript.length} segments, proceeding to content generation`);
       
       // 2. Generate summary
       const summaryResponse = await supabase.functions.invoke('generate-course-content', {
@@ -46,6 +52,7 @@ export const useCourseContent = (videoId: string | undefined) => {
       });
       
       if (summaryResponse.error) {
+        console.error('Failed to generate summary:', summaryResponse.error);
         throw new Error(`Failed to generate summary: ${summaryResponse.error.message}`);
       }
       
@@ -55,6 +62,7 @@ export const useCourseContent = (videoId: string | undefined) => {
       });
       
       if (questionsResponse.error) {
+        console.error('Failed to generate questions:', questionsResponse.error);
         throw new Error(`Failed to generate questions: ${questionsResponse.error.message}`);
       }
       

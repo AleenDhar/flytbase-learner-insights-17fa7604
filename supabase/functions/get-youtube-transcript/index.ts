@@ -24,6 +24,9 @@ serve(async (req) => {
       );
     }
 
+    console.log(`Fetching transcript for video ID: ${videoId}`);
+
+    // Try multiple approaches to get the transcript
     // First, try to get transcript directly from timedtext API
     let transcript = await fetchTimedTextTranscriptDirect(videoId);
     
@@ -42,6 +45,8 @@ serve(async (req) => {
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    console.log(`Successfully retrieved transcript with ${transcript.length} segments`);
 
     return new Response(
       JSON.stringify({ transcript }),
@@ -62,6 +67,7 @@ serve(async (req) => {
 // Direct approach - fetch from timedtext API without page parsing
 async function fetchTimedTextTranscriptDirect(videoId: string): Promise<any[]> {
   try {
+    console.log("Attempting direct timedtext API approach");
     // First try to get available transcript info
     const infoUrl = `https://www.youtube.com/api/timedtext?type=list&v=${videoId}`;
     const infoResponse = await fetch(infoUrl);
@@ -81,6 +87,7 @@ async function fetchTimedTextTranscriptDirect(videoId: string): Promise<any[]> {
     }
     
     const langCode = langMatch[1];
+    console.log(`Found language code: ${langCode}`);
     
     // Fetch the transcript with the identified language
     const transcriptUrl = `https://www.youtube.com/api/timedtext?lang=${langCode}&v=${videoId}&fmt=json3`;
@@ -96,7 +103,7 @@ async function fetchTimedTextTranscriptDirect(videoId: string): Promise<any[]> {
       const transcriptData = await transcriptResponse.json();
       
       if (transcriptData.events) {
-        return transcriptData.events
+        const segments = transcriptData.events
           .filter((event: any) => event.segs && event.segs.length > 0)
           .map((event: any) => {
             const text = event.segs
@@ -111,6 +118,9 @@ async function fetchTimedTextTranscriptDirect(videoId: string): Promise<any[]> {
             };
           })
           .filter((segment: any) => segment.text.length > 0);
+          
+        console.log(`Direct approach succeeded with ${segments.length} segments`);
+        return segments;
       }
     } catch (e) {
       // If JSON parsing fails, try XML format (older videos)
@@ -146,6 +156,7 @@ async function fetchTimedTextTranscriptDirect(videoId: string): Promise<any[]> {
         });
       }
       
+      console.log(`XML approach succeeded with ${transcript.length} segments`);
       return transcript;
     }
     
@@ -159,7 +170,8 @@ async function fetchTimedTextTranscriptDirect(videoId: string): Promise<any[]> {
 // Page parsing approach - fetch the YouTube page and extract transcript data
 async function fetchTranscriptFromPage(videoId: string): Promise<any[]> {
   try {
-    // Fetch the video page
+    console.log("Attempting page parsing approach");
+    // Fetch the video page with a realistic user agent
     const videoPageResponse = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
@@ -201,6 +213,8 @@ async function fetchTranscriptFromPage(videoId: string): Promise<any[]> {
     let transcriptUrl = urlMatch[1].replace(/\\u0026/g, '&');
     transcriptUrl = `${transcriptUrl}&fmt=json3`;
     
+    console.log(`Attempting to fetch transcript from: ${transcriptUrl}`);
+    
     const transcriptResponse = await fetch(transcriptUrl);
     if (!transcriptResponse.ok) {
       console.error(`Failed to fetch transcript data: ${transcriptResponse.status}`);
@@ -211,7 +225,7 @@ async function fetchTranscriptFromPage(videoId: string): Promise<any[]> {
     
     // Format the transcript data into our expected structure
     if (transcriptData.events) {
-      return transcriptData.events
+      const segments = transcriptData.events
         .filter((event: any) => event.segs && event.segs.length > 0)
         .map((event: any) => {
           const text = event.segs
@@ -226,6 +240,9 @@ async function fetchTranscriptFromPage(videoId: string): Promise<any[]> {
           };
         })
         .filter((segment: any) => segment.text.length > 0);
+        
+      console.log(`Page parsing approach succeeded with ${segments.length} segments`);
+      return segments;
     }
     
     return [];

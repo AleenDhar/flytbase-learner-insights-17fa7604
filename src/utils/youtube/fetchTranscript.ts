@@ -23,6 +23,8 @@ export const fetchTranscript = async (videoId: string): Promise<TranscriptSegmen
     
     while (attempt < maxAttempts) {
       try {
+        console.log(`Attempting to fetch transcript for video ${videoId}, attempt ${attempt + 1}/${maxAttempts}`);
+        
         // Add timestamp to prevent caching issues
         const timestamp = new Date().getTime();
         const response = await fetch(
@@ -53,6 +55,7 @@ export const fetchTranscript = async (videoId: string): Promise<TranscriptSegmen
           throw new Error('No transcript segments returned');
         }
         
+        console.log(`Successfully fetched transcript with ${data.transcript.length} segments`);
         return data.transcript;
       } catch (error) {
         lastError = error;

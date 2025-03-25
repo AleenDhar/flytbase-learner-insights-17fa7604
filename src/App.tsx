@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -106,9 +107,7 @@ const AppRoutes = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <AppRoutes />
-    </AuthProvider>
+    <AppRoutes />
   );
 }
 

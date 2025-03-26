@@ -14,6 +14,7 @@ export interface AssessmentProps {
   timeLimit: string;
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
   thumbnail: string;
+  courseId: string; // Added the missing courseId property
 }
 
 const AssessmentCard: React.FC<AssessmentProps> = ({
@@ -23,7 +24,8 @@ const AssessmentCard: React.FC<AssessmentProps> = ({
   questions,
   timeLimit,
   difficulty,
-  thumbnail
+  thumbnail,
+  courseId // Added parameter
 }) => {
   // Function to determine badge color based on difficulty
   const getBadgeColor = (difficulty: string) => {

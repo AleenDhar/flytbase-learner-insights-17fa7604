@@ -13,15 +13,19 @@ export interface UserCourse {
   id: string;
   course_id: string;
   progress: number;
-  status: 'completed' | 'in_progress' | 'not_started';
-  started_at: string;
+  status: string; // Changed from union type to string to match DB
+  started_at: string | null;
   completed_at: string | null;
-  last_accessed_at: string;
+  last_accessed_at: string | null;
   course?: {
     id: string;
     title: string;
     thumbnail: string;
   };
+  // Additional properties from the database
+  created_at: string;
+  updated_at: string;
+  user_id: string;
 }
 
 interface UserCoursesProps {
@@ -71,7 +75,7 @@ const UserCourses: React.FC<UserCoursesProps> = ({ type, limit = 3, showViewAll 
         }
         
         // Map the courses to the user courses
-        const userCoursesWithCourseDetails: UserCourse[] = userCoursesData.map(userCourse => {
+        const userCoursesWithCourseDetails = userCoursesData.map(userCourse => {
           const courseDetails = coursesData.find(course => course.id === userCourse.course_id);
           return {
             ...userCourse,
@@ -83,7 +87,7 @@ const UserCourses: React.FC<UserCoursesProps> = ({ type, limit = 3, showViewAll 
           };
         });
         
-        return userCoursesWithCourseDetails;
+        return userCoursesWithCourseDetails as UserCourse[];
       }
       
       return [];

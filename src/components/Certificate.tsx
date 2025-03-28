@@ -80,7 +80,7 @@ const Certificate = ({
           </Button>
         </div>
         
-        <div ref={certificateRef} className="bg-white p-8 border-2 border-blue-600 rounded-lg">
+        <div ref={certificateRef} className="bg-white p-8 border-2 border-blue-600 rounded-lg text-black">
           <div className="text-center mb-6">
             {/* FlytBase Logo */}
             <div className="flex justify-between items-start mb-4">
